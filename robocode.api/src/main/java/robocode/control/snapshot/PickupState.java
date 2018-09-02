@@ -81,6 +81,6 @@ public enum PickupState {
 	}
 	
 	public boolean isActive() {
-		return this == SPAWNED || this == AVAILABLE || this == UNAVAILABLE;
+		return this == SPAWNED || this == AVAILABLE;
 	}
 }

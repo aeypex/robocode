@@ -10,6 +10,7 @@ package net.sf.robocode.battle.snapshot;
 
 import net.sf.robocode.battle.Battle;
 import net.sf.robocode.battle.peer.BulletPeer;
+import net.sf.robocode.battle.peer.PickupPeer;
 import net.sf.robocode.battle.peer.RobotPeer;
 import net.sf.robocode.serialization.IXmlSerializable;
 import net.sf.robocode.serialization.XmlReader;
@@ -36,6 +37,9 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 
 	/** List of snapshots for the robots participating in the battle */
 	private List<IRobotSnapshot> robots;
+	
+	/** List of snapshots for the pickups in the battle */
+	private List<IPickupSnapshot> pickups;
 
 	/** List of snapshots for the bullets that are currently on the battlefield */
 	private List<IBulletSnapshot> bullets;
@@ -49,6 +53,7 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	/** Current turn in the battle round */
 	private int turn;
 
+
 	/**
 	 * Creates a snapshot of a battle turn that must be filled out with data later.
 	 */
@@ -59,16 +64,22 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	 *
 	 * @param battle the battle to make a snapshot of.
 	 * @param battleRobots the robots participating in the battle.
+	 * @param pickups 
 	 * @param battleBullets the current bullet on the battlefield.
 	 * @param readoutText {@code true} if the output text from the robots must be included in the snapshot;
 	 *                    {@code false} otherwise.
 	 */
-	public TurnSnapshot(Battle battle, List<RobotPeer> battleRobots, List<BulletPeer> battleBullets, boolean readoutText) {
+	public TurnSnapshot(Battle battle, List<RobotPeer> battleRobots, List<PickupPeer> battlePickups, List<BulletPeer> battleBullets, boolean readoutText) {
 		robots = new ArrayList<IRobotSnapshot>();
+		pickups = new ArrayList<IPickupSnapshot>();
 		bullets = new ArrayList<IBulletSnapshot>();
 
 		for (RobotPeer robotPeer : battleRobots) {
 			robots.add(new RobotSnapshot(robotPeer, readoutText));
+		}
+		
+		for (PickupPeer pickupPeer : battlePickups) {
+			pickups.add(new PickupSnapshot(pickupPeer));
 		}
 
 		for (BulletPeer bulletPeer : battleBullets) {

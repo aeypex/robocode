@@ -25,7 +25,7 @@ import java.util.Random;
  */
 public class PickupPeer {
 	
-	public static final int defaultPickupColor = 0xABCDEFFF;
+	public static final int defaultPickupColor = 0xFFABCDEF;
 	
 	public static final int
 	WIDTH = 36,
