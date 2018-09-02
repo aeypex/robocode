@@ -11,6 +11,7 @@ package net.sf.robocode.battle;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.battle.peer.BulletPeer;
 import net.sf.robocode.battle.peer.ContestantPeer;
+import net.sf.robocode.battle.peer.PickupPeer;
 import net.sf.robocode.battle.peer.RobotPeer;
 import net.sf.robocode.battle.peer.TeamPeer;
 import net.sf.robocode.battle.snapshot.TurnSnapshot;
@@ -22,6 +23,7 @@ import net.sf.robocode.repository.IRobotItem;
 import net.sf.robocode.security.HiddenAccess;
 import net.sf.robocode.settings.ISettingsManager;
 import robocode.*;
+import robocode.control.PickupSetup;
 import robocode.control.RandomFactory;
 import robocode.control.RobotResults;
 import robocode.control.RobotSetup;
@@ -70,6 +72,7 @@ public final class Battle extends BaseBattle {
 	private List<RobotPeer> robots = new ArrayList<RobotPeer>();
 	private List<ContestantPeer> contestants = new ArrayList<ContestantPeer>();
 	private final List<BulletPeer> bullets = new CopyOnWriteArrayList<BulletPeer>();
+	private List<PickupPeer> pickups = new ArrayList<PickupPeer>();
 
 	// Robot counters
 	private int activeParticipants;
@@ -80,10 +83,12 @@ public final class Battle extends BaseBattle {
 
 	// Initial robot setups (if any)
 	private RobotSetup[] initialRobotSetups;
+	
+	// Initial pickup setups (if any)
+	private PickupSetup[] initialPickupSetups;
 
 	public Battle(ISettingsManager properties, IBattleManager battleManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher eventDispatcher) { // NO_UCD (unused code)
-		super(
-				properties, battleManager, eventDispatcher);
+		super(properties, battleManager, eventDispatcher);
 		this.hostManager = hostManager;
 		this.cpuConstant = cpuManager.getCpuConstant();
 	}
@@ -339,12 +344,18 @@ public final class Battle extends BaseBattle {
 
 		// At this point the unsafe loader thread will now set itself to wait for a notify
 
+		for (PickupPeer pickupPeer : pickups) {
+			pickupPeer.initializeRound(initialPickupSetups);
+		}
+		
 		for (RobotPeer robotPeer : robots) {
-			robotPeer.initializeRound(robots, initialRobotSetups);
+			robotPeer.initializeRound(robots, pickups, initialRobotSetups);
 			robotPeer.println("=========================");
 			robotPeer.println("Round " + (getRoundNum() + 1) + " of " + getNumRounds());
 			robotPeer.println("=========================");
 		}
+		
+		
 
 		if (getRoundNum() == 0) {
 			eventDispatcher.onBattleStarted(new BattleStartedEvent(battleRules, robots.size(), false));

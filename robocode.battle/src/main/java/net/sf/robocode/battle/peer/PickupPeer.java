@@ -10,16 +10,22 @@ package net.sf.robocode.battle.peer;
 
 import net.sf.robocode.battle.BoundingRectangle;
 import robocode.*;
+import robocode.control.PickupSetup;
+import robocode.control.RandomFactory;
 import robocode.control.snapshot.PickupState;
 
 import java.util.List;
+import java.util.Random;
 
 
 /**
  * @author see Bullet (original)
  * @author Andreas Stock (contributor)
+ * @since 1.9.3.2
  */
 public class PickupPeer {
+	
+	public static final int defaultPickupColor = 0xABCDEFFF;
 	
 	public static final int
 	WIDTH = 36,
@@ -29,7 +35,6 @@ public class PickupPeer {
 	HALF_WIDTH_OFFSET = WIDTH / 2,
 	HALF_HEIGHT_OFFSET = HEIGHT / 2;
 
-	@SuppressWarnings("unused")
 	private final BattleRules battleRules;
 	private final int pickupId;
 
@@ -44,7 +49,7 @@ public class PickupPeer {
 
 	protected int frame; // Do not set to -1
 
-	private final int color;
+	private final int color = defaultPickupColor;
 
 	PickupPeer(RobotPeer owner, BattleRules battleRules, int pickupId) {
 		super();
@@ -52,7 +57,6 @@ public class PickupPeer {
 		this.pickupId = pickupId;
 		this.boundingBox = new BoundingRectangle();
 		state = PickupState.SPAWNED;
-		color = owner.getBulletColor(); // Store current bullet color set on robot
 	}
 	
 	public BoundingRectangle getBoundingBox() {
@@ -150,7 +154,7 @@ public class PickupPeer {
 		state = newState;
 	}
 
-	public void update(List<RobotPeer> robots, List<PickupPeer> bullets) {
+	public void update(List<RobotPeer> robots) {
 		frame++;
 		if (isActive()) {
 			checkRobotCollision(robots);
@@ -188,5 +192,46 @@ public class PickupPeer {
 	@Override
 	public String toString() {
 		return getVictim().getName() + " V" + (int) Rules.PICKUP_ENERGY_GAIN + " X" + (int) x + " Y" + (int) y + " " + state.toString();
+	}
+
+	public void initializeRound(PickupSetup[] initialPickupSetups) {
+		boolean valid = false;
+
+		if (initialPickupSetups != null) {
+
+			if (pickupId >= 0 && pickupId < initialPickupSetups.length) {
+				PickupSetup setup = initialPickupSetups[pickupId];
+				if (setup != null) {
+					x = setup.getX();
+					y = setup.getY();
+
+					updateBoundingBox();
+				}
+			}
+		}
+
+		if (!valid) {
+			final Random random = RandomFactory.getRandom();
+			
+			double rndX = 0;
+			double rndY = 0;
+			int weight = 4; //so that pickups land more to the middle. see "law of large numbers" 
+			for (int i = 0; i < weight; i++) {
+				rndX += random.nextDouble();
+				rndY += random.nextDouble();
+			}
+			rndX /= weight;
+			rndY /= weight;
+			
+			x = PickupPeer.WIDTH + rndX * (battleRules.getBattlefieldWidth() - 2 * PickupPeer.WIDTH);
+			y = PickupPeer.HEIGHT + rndY * (battleRules.getBattlefieldHeight() - 2 * PickupPeer.HEIGHT);
+			
+			updateBoundingBox();
+			
+		}
+		setState(PickupState.SPAWNED);
+		frame = 0;
+
+		//status = new AtomicReference<RobotStatus>();
 	}
 }

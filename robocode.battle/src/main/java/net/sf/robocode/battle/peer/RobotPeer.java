@@ -651,7 +651,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
-	public void initializeRound(List<RobotPeer> robots, RobotSetup[] initialRobotSetups) {
+	public void initializeRound(List<RobotPeer> robots, List<PickupPeer> pickups, RobotSetup[] initialRobotSetups) {
 		boolean valid = false;
 
 		if (initialRobotSetups != null) {
@@ -665,7 +665,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 					bodyHeading = gunHeading = radarHeading = setup.getHeading();
 
 					updateBoundingBox();
-					valid = validSpot(robots);
+					valid = validSpot(robots, pickups);
 				}
 			}
 		}
@@ -716,7 +716,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 				gunHeading = radarHeading = bodyHeading;
 				updateBoundingBox();
 
-				if (validSpot(robots)) {
+				if (validSpot(robots, pickups)) {
 					break;
 				}
 			}
@@ -773,13 +773,20 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		commands = new AtomicReference<ExecCommands>(newExecCommands);
 	}
 
-	private boolean validSpot(List<RobotPeer> robots) {
+	private boolean validSpot(List<RobotPeer> robots, List<PickupPeer> pickups) {
 		for (RobotPeer otherRobot : robots) {
 			if (otherRobot != null && otherRobot != this) {
 				if (getBoundingBox().intersects(otherRobot.getBoundingBox())) {
 					return false;
 				}
 			}
+		}
+		for (PickupPeer pickupPeer : pickups) {
+			if (pickupPeer.isActive()
+					&& pickupPeer.getBoundingBox().intersects(getBoundingBox())) {
+				return false;
+			}
+				
 		}
 		return true;
 	}
