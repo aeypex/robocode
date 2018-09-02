@@ -143,6 +143,16 @@ public final class Rules {
 	 * which is 2 x {@link ROBOT_HIT_DAMAGE} = 1.2 energy points.
 	 */
 	public static final double ROBOT_HIT_BONUS = 2 * ROBOT_HIT_DAMAGE;
+	
+	/**
+	 * The amount of Energy gained by picking up the Item.
+	 */
+	public static final double PICKUP_ENERGY_GAIN = 100;
+	
+	/**
+	 * The amount of Turns after picking up the Item, before its available again.
+	 */
+	public static final int PICKUP_RESPAWN_TIME = 30;
 
 	/**
 	 * Returns the turn rate of a robot given a specific velocity measured in

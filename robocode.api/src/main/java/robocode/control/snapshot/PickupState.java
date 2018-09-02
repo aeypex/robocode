@@ -11,9 +11,7 @@ package robocode.control.snapshot;
 /**
  * Defines a pickup state, which can be: just spawned, available, hitting a victim, unavailable or inactive.
  *
- * @author Flemming N. Larsen (original)
- *
- * @since 1.6.2
+ * @author Andreas Stock
  */
 public enum PickupState {
 
