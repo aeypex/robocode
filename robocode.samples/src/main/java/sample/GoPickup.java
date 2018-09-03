@@ -1,4 +1,4 @@
-package eyepex;
+package sample;
 import java.awt.Color;
 
 import robocode.*;
