@@ -8,7 +8,10 @@
 package robocode;
 
 
+import java.awt.geom.Point2D;
+import java.util.Random;
 import net.sf.robocode.security.IHiddenRulesHelper;
+import robocode.control.RandomFactory;
 
 
 /**
@@ -144,5 +147,33 @@ public final class BattleRules implements java.io.Serializable {
 			return new BattleRules(battlefieldWidth, battlefieldHeight, numRounds, gunCoolingRate, inactivityTime,
 					hideEnemyNames, sentryBorderSize);
 		}
+	}
+
+
+	/**
+	 * 
+	 * @param width minimal distance to border
+	 * @param height minimal distance to border 
+	 * @param loln 1 is normal. set higher (ie. 10) so that position is more in middle. see law of large numbers.
+	 * @return a random position on the specified battlefield
+	 * 
+	 * @author Andreas Stock
+	 */
+	public Point2D calculateRandomPosition(int width, int height, int loln) {
+		final Random random = RandomFactory.getRandom();
+		
+		double rndX = random.nextDouble();
+		double rndY = random.nextDouble(); 
+		for (int i = 0; i < loln-1; i++) {
+			rndX += random.nextDouble();
+			rndY += random.nextDouble();
+		}
+		rndX /= loln;
+		rndY /= loln;
+		
+		double x = width + rndX * (getBattlefieldWidth() - 2 * width);
+		double y = height + rndY * (getBattlefieldHeight() - 2 * height);
+		
+		return new Point2D.Double(x,y);
 	}
 }

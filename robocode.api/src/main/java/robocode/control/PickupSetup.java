@@ -7,6 +7,7 @@
  */
 package robocode.control;
 
+import robocode.Rules;
 
 /**
  * Contains the initial position for a Pickup.
@@ -23,6 +24,10 @@ public class PickupSetup implements java.io.Serializable {
 	private final Double x;
 	private final Double y;
 
+	private double energygain = Rules.PICKUP_ENERGY_BONUS;
+
+	private double respawntime = Rules.PICKUP_RESPAWN_TIME;
+
 	/**
 	 * Constructs a new PickupSetup.
 	 *
@@ -32,6 +37,12 @@ public class PickupSetup implements java.io.Serializable {
 	public PickupSetup(Double x, Double y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public PickupSetup(double x2, double y2, double energygain, double respawntime) {
+		this(x2,y2);
+		this.energygain = energygain;
+		this.respawntime = respawntime;
 	}
 
 	/**
@@ -49,5 +60,15 @@ public class PickupSetup implements java.io.Serializable {
 	public Double getY() {
 		return y;
 	}
+
+	public double getEnergygain() {
+		return energygain;
+	}
+
+	public double getRespawntime() {
+		return respawntime;
+	}
+
+	
 
 }

@@ -145,14 +145,19 @@ public final class Rules {
 	public static final double ROBOT_HIT_BONUS = 2 * ROBOT_HIT_DAMAGE;
 	
 	/**
+	 * The maximum amount of Energy a robot can have.
+	 */
+	public static final double ROBOT_MAX_ENERGY = 200;
+	
+	/**
 	 * The amount of Energy gained by picking up the Item.
 	 */
-	public static final double PICKUP_ENERGY_GAIN = 100;
+	public static final double PICKUP_ENERGY_BONUS = 50;
 	
 	/**
 	 * The amount of Turns after picking up the Item, before its available again.
 	 */
-	public static final int PICKUP_RESPAWN_TIME = 30;
+	public static final int PICKUP_RESPAWN_TIME = 100;
 
 	/**
 	 * Returns the turn rate of a robot given a specific velocity measured in

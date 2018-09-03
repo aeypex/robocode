@@ -28,7 +28,10 @@ public enum PickupState {
 	UNAVAILABLE(3),
 
 	/** The Pickup is currently inactive. Hence, it is not active or visible on the battlefield. */
-	INACTIVE(4);
+	INACTIVE(4),
+	
+	/** The Pickup is ok to be removed and cleaned up. */
+	REMOVE(5);
 
 	private final int value;
 
@@ -74,6 +77,9 @@ public enum PickupState {
 
 		case 4:
 			return INACTIVE;
+
+		case 5:
+			return REMOVE;
 
 		default:
 			throw new IllegalArgumentException("unknown value");

@@ -32,7 +32,9 @@ import robocode.control.events.*;
 import robocode.control.events.RoundEndedEvent;
 import robocode.control.snapshot.BulletState;
 import robocode.control.snapshot.ITurnSnapshot;
+import robocode.control.snapshot.PickupState;
 
+import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
@@ -69,6 +71,7 @@ public final class Battle extends BaseBattle {
 
 	// Objects in the battle
 	private int robotsCount;
+	private int pickupsCount;
 	private List<RobotPeer> robots = new ArrayList<RobotPeer>();
 	private List<ContestantPeer> contestants = new ArrayList<ContestantPeer>();
 	private final List<BulletPeer> bullets = new CopyOnWriteArrayList<BulletPeer>();
@@ -83,9 +86,9 @@ public final class Battle extends BaseBattle {
 
 	// Initial robot setups (if any)
 	private RobotSetup[] initialRobotSetups;
-	
-	// Initial pickup setups (if any)
+
 	private PickupSetup[] initialPickupSetups;
+	
 
 	public Battle(ISettingsManager properties, IBattleManager battleManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher eventDispatcher) { // NO_UCD (unused code)
 		super(properties, battleManager, eventDispatcher);
@@ -98,9 +101,29 @@ public final class Battle extends BaseBattle {
 		battleRules = HiddenAccess.createRules(battleProps.getBattlefieldWidth(), battleProps.getBattlefieldHeight(),
 				battleProps.getNumRounds(), battleProps.getGunCoolingRate(), battleProps.getInactivityTime(),
 				battleProps.getHideEnemyNames(), battleProps.getSentryBorderSize());
+		
 		robotsCount = battlingRobotsList.length;
 		computeInitialPositions(battleProps.getInitialPositions());
 		createPeers(battlingRobotsList);
+		
+		pickupsCount = battleProps.getNumPickups();
+		initialPickupSetups = computeInitialPickupSetups(battleProps);
+		createPickupPeers();
+	}
+
+	private void createPickupPeers() {
+		if (initialPickupSetups != null) {
+			for (PickupSetup ps : initialPickupSetups) {
+				final PickupPeer pickupPeer = new PickupPeer(ps, battleRules, pickups.size());
+				pickups.add(pickupPeer);
+			}
+		}
+		/*
+		//if there are not enough setups specified, create the rest randomly
+		for (int i = pickups.size(); i < pickupsCount; i++) {
+			final PickupPeer pickupPeer = new PickupPeer(battleRules,pickups.size());
+			pickups.add(pickupPeer);
+		}*/
 	}
 
 	private void createPeers(RobotSpecification[] battlingRobotsList) {
@@ -234,6 +257,10 @@ public final class Battle extends BaseBattle {
 		return robotsCount;
 	}
 
+	public int getPickupsCount() {
+		return pickupsCount;
+	}
+
 	public boolean isDebugging() {
 		return RobocodeProperties.isDebuggingOn();
 	}
@@ -331,6 +358,7 @@ public final class Battle extends BaseBattle {
 		for (RobotPeer robotPeer : robots) {
 			robotPeer.cleanup();
 		}
+		pickups.clear();
 		hostManager.resetThreadManager();
 
 		super.finalizeBattle();
@@ -345,7 +373,7 @@ public final class Battle extends BaseBattle {
 		// At this point the unsafe loader thread will now set itself to wait for a notify
 
 		for (PickupPeer pickupPeer : pickups) {
-			pickupPeer.initializeRound(initialPickupSetups);
+			pickupPeer.initializeRound();
 		}
 		
 		for (RobotPeer robotPeer : robots) {
@@ -406,6 +434,9 @@ public final class Battle extends BaseBattle {
 		for (RobotPeer robotPeer : robots) {
 			robotPeer.waitForStop();
 		}
+		for (PickupPeer pickupPeer : pickups) {
+			pickupPeer.cleanupAfterRoundEnded();
+		}
 		bullets.clear();
 
 		eventDispatcher.onRoundEnded(new RoundEndedEvent(getRoundNum(), currentTime, totalTurns));
@@ -425,6 +456,8 @@ public final class Battle extends BaseBattle {
 		loadCommands();
 
 		updateBullets();
+		
+		updatePickups();
 
 		updateRobots();
 
@@ -443,6 +476,8 @@ public final class Battle extends BaseBattle {
 		// Robot time!
 		wakeupRobots();
 	}
+
+	
 
 	@Override
 	protected void shutdownTurn() {
@@ -588,6 +623,15 @@ public final class Battle extends BaseBattle {
 			}
 		}
 	}
+	
+	private void updatePickups() {
+		for (PickupPeer p : pickups) {
+			p.update(getRobotsAtRandom());
+			if (p.getState() == PickupState.REMOVE) {
+				pickups.remove(p);
+			}
+		}
+	}
 
 	private void updateRobots() {
 		boolean zap = (inactiveTurnCount > battleRules.getInactivityTime());
@@ -601,7 +645,7 @@ public final class Battle extends BaseBattle {
 
 		// Scan after moved all
 		for (RobotPeer robotPeer : getRobotsAtRandom()) {
-			robotPeer.performScan(getRobotsAtRandom());
+			robotPeer.performScan(getRobotsAtRandom(), pickups);
 		}
 	}
 
@@ -792,6 +836,82 @@ public final class Battle extends BaseBattle {
 			}
 			initialRobotSetups[i] = new RobotSetup(x, y, heading);
 		}
+	}
+	
+	private PickupSetup[] computeInitialPickupSetups(BattleProperties battleProps) {
+		
+		PickupSetup[] thePickupSetups = null;
+
+		String battlePropsPickupSpec = battleProps.getInitialPickupSpecification();
+		if (battlePropsPickupSpec  == null || battlePropsPickupSpec.trim().length() == 0) {
+			return null;
+		}
+
+		List<String> positions = new ArrayList<String>();
+
+		Pattern pattern = Pattern.compile("([^,(]*[(][^)]*[)])?[^,]*,?");
+		Matcher matcher = pattern.matcher(battlePropsPickupSpec);
+
+		while (matcher.find()) {
+			String pos = matcher.group();
+			if (pos.length() > 0) {
+				positions.add(pos);
+			}
+		}
+		if (positions.size() == 0) {
+			return null;
+		}
+
+		thePickupSetups = new PickupSetup[Math.max(positions.size(),battleProps.getNumPickups())];
+
+		String[] coords;
+		double x=0, y=0, energygain = 0, respawntime=0;
+		
+		for (int i = 0; i < thePickupSetups.length; i++) {
+			Point2D p = battleRules.calculateRandomPosition(PickupPeer.WIDTH, PickupPeer.HEIGHT, PickupPeer.LOLN);
+			x = p.getX();
+			y = p.getY();
+			energygain = battleProps.getPickupEnergyBonus();
+			respawntime = battleProps.getPickupRespawnTime();
+			thePickupSetups[i] = new PickupSetup(x, y, energygain, respawntime);
+		}
+
+		for (int i = 0; i < positions.size(); i++) {
+			coords = positions.get(i).split(",");
+
+			int len = coords.length;
+			
+			int j = 0;
+			if (len >= j+1 && coords[j].trim().length() > 0) {
+				try {
+					x = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+				} catch (NumberFormatException ignore) {// Could be the '?', which is fine
+				}
+				j++;
+				if (len >= j+1 && coords[j].trim().length() > 0) {
+					try {
+						y = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+					} catch (NumberFormatException ignore) {// Could be the '?', which is fine
+					}
+					j++;
+					if (len >= j+1 && coords[j].trim().length() > 0) {
+						try {
+							energygain = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+						} catch (NumberFormatException ignore) {// Could be the '?', which is fine
+						}
+						j++;
+						if (len >= j+1 && coords[j].trim().length() > 0) {
+							try {
+								respawntime = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+							} catch (NumberFormatException ignore) {// Could be the '?', which is fine
+							}
+						}
+					}
+				}
+			}
+			thePickupSetups[i] = new PickupSetup(x, y, energygain, respawntime);
+		}
+		return thePickupSetups;
 	}
 
 	private boolean oneTeamRemaining() {

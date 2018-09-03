@@ -10,6 +10,8 @@ package net.sf.robocode.battle;
 
 import robocode.AdvancedRobot;
 import robocode.Robot;
+import robocode.Rules;
+import robocode.control.PickupSetup;
 import robocode.control.RobotSetup;
 import robocode.control.RobotSpecification;
 
@@ -37,7 +39,12 @@ public class BattleProperties implements Serializable {
 			BATTLE_HIDE_ENEMY_NAMES = "robocode.battle.hideEnemyNames",
 			BATTLE_SELECTEDROBOTS = "robocode.battle.selectedRobots",
 			BATTLE_INITIAL_POSITIONS = "robocode.battle.initialPositions",
-			BATTLE_SENTRY_BORDER_SIZE = "robocode.battle.sentryBorderSize";
+			BATTLE_SENTRY_BORDER_SIZE = "robocode.battle.sentryBorderSize",
+			BATTLE_NUMPICKUPS = "robocode.battle.pickups.numPickups",
+			BATTLE_PICKUP_ENERGY_BONUS = "robocode.battle.pickups.energyBonus",
+			BATTLE_RESPAWN_TIME = "robocode.battle.pickups.respawnTime" ,
+			BATTLE_INITIAL_PICKUP_SPECIFICATION = "robocode.battle.pickups.initialSpec";
+			
 
 	private int battlefieldWidth = 800;
 	private int battlefieldHeight = 600;
@@ -48,8 +55,14 @@ public class BattleProperties implements Serializable {
 	private int sentryBorderSize = 100;
 	private String selectedRobots;
 	private String initialPositions;
+	
+	private String initialPickupSpecification;
+	private double pickupEnergyBonus = Rules.PICKUP_ENERGY_BONUS;
+	private double pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
+	private int numPickups = 1;
 
 	private final Properties props = new Properties();
+
 
 	/**
 	 * Gets the battlefieldWidth.
@@ -314,6 +327,64 @@ public class BattleProperties implements Serializable {
 		props.setProperty(BATTLE_SENTRY_BORDER_SIZE, "" + sentryBorderSize);
 	}
 
+	public String getInitialPickupSpecification() {
+		return initialPickupSpecification;
+	}
+
+	public void setInitialPickupSpecification(String initialPickupPositions) {
+		this.initialPickupSpecification = initialPickupPositions;
+	}
+	
+	/**
+	 * Sets the initial pickup positions and headings.
+	 *
+	 * @param initialSetups is the initial positions and headings as a {@link PickupSetup} array.
+	 * 
+	 */
+	public void setInitiaPickupSpecification(PickupSetup[] initialSetups) {
+		if (initialSetups == null) {
+			return;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		for (PickupSetup setup : initialSetups) {
+			String x = (setup.getX() == null) ? "?" : "" + setup.getX();
+			String y = (setup.getY() == null) ? "?" : "" + setup.getY();
+
+			sb.append('(');
+			sb.append(x).append(',');
+			sb.append(y);
+			sb.append("),");
+		}
+		
+		this.initialPickupSpecification = sb.toString();
+	}
+
+	public int getNumPickups() {
+		return numPickups;
+	}
+
+	public void setNumPickups(int numPickups) {
+		this.numPickups = numPickups;
+	}
+
+	public double getPickupEnergyBonus() {
+		return pickupEnergyBonus;
+	}
+
+	public void setPickupEnergyBonus(double pickupEnergyBonus) {
+		this.pickupEnergyBonus = pickupEnergyBonus;
+	}
+
+	public double getPickupRespawnTime() {
+		return pickupRespawnTime;
+	}
+
+	public void setPickupRespawnTime(double pickupRespawnTime) {
+		this.pickupRespawnTime = pickupRespawnTime;
+	}
+
 	public void store(FileOutputStream out, String desc) throws IOException {
 		props.store(out, desc);
 	}
@@ -328,6 +399,11 @@ public class BattleProperties implements Serializable {
 		numRounds = Integer.parseInt(props.getProperty(BATTLE_NUMROUNDS, "10"));
 		selectedRobots = props.getProperty(BATTLE_SELECTEDROBOTS, "");
 		initialPositions = props.getProperty(BATTLE_INITIAL_POSITIONS, "");
+		numPickups = Integer.parseInt(props.getProperty(BATTLE_NUMPICKUPS, "0"));
+		pickupEnergyBonus = Double.parseDouble(props.getProperty(BATTLE_PICKUP_ENERGY_BONUS, ""+Rules.PICKUP_ENERGY_BONUS));
+		pickupRespawnTime = Double.parseDouble(props.getProperty(BATTLE_RESPAWN_TIME, ""+Rules.PICKUP_RESPAWN_TIME));
+		initialPickupSpecification = props.getProperty(BATTLE_INITIAL_PICKUP_SPECIFICATION, "");
 		sentryBorderSize = Integer.parseInt(props.getProperty(BATTLE_SENTRY_BORDER_SIZE, "100"));
 	}
+
 }

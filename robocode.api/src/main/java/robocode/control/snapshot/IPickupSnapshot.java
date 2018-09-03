@@ -58,6 +58,18 @@ public interface IPickupSnapshot {
 	 * @return the Y painting position of the pickup.
 	 */
 	double getPaintY();
+	
+	/**
+	 * @return The amount of Energy gained by picking up the pickup
+	 */
+	double getPickupEnergyBonus();
+	
+	
+	/**
+	 * @return The amount of Turns after the picked up pickup is available again.
+	 */
+	double getPickupRespawnTime();
+	
 
 	/**
 	 * Returns the color of the pickup.

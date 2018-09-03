@@ -13,6 +13,7 @@ import net.sf.robocode.serialization.IXmlSerializable;
 import net.sf.robocode.serialization.XmlReader;
 import net.sf.robocode.serialization.SerializableOptions;
 import net.sf.robocode.serialization.XmlWriter;
+import robocode.Rules;
 import robocode.control.snapshot.IPickupSnapshot;
 import robocode.control.snapshot.PickupState;
 
@@ -48,11 +49,21 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 
 	private int victimIndex = -1;
 
-	private int frame;
+	private int turnCounter;
 
 	private double paintX;
 
 	private double paintY;
+	
+	/**
+	 * The amount of Energy gained by picking up the Item.
+	 */
+	private double pickupEnergyBonus;
+
+	/**
+	 * The amount of Turns after picking up the Item, before its available again.
+	 */
+	private double pickupRespawnTime;
 
 	/**
 	 * Creates a snapshot of a bullet that must be filled out with data later.
@@ -60,6 +71,8 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 	public PickupSnapshot() {
 		state = PickupState.INACTIVE;
 		victimIndex = -1;
+		pickupEnergyBonus = Rules.PICKUP_ENERGY_BONUS;
+		pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
 	}
 
 	/**
@@ -76,9 +89,12 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 		x = paintX = pickup.getX();
 		y = paintY = pickup.getY();
 
+		pickupEnergyBonus = pickup.getPickupEnergyBonus();
+		pickupRespawnTime = pickup.getPickupRespawnTime();
+
 		color = pickup.getColor();
 
-		frame = pickup.getFrame();
+		turnCounter = pickup.getFrame();
 
 		final net.sf.robocode.battle.peer.RobotPeer victim = pickup.getVictim();
 
@@ -134,6 +150,20 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 	public double getPaintY() {
 		return paintY;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public double getPickupEnergyBonus() {
+		return pickupEnergyBonus;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public double getPickupRespawnTime() {
+		return pickupRespawnTime;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -146,7 +176,7 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 	 * {@inheritDoc}
 	 */
 	public int getFrame() {
-		return frame;
+		return turnCounter;
 	}
 
 	/**
@@ -170,15 +200,19 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 			writer.writeAttribute("x", paintX, options.trimPrecision);
 			writer.writeAttribute("y", paintY, options.trimPrecision);
 			
+			writer.writeAttribute("EnergyBonus", this.pickupEnergyBonus, options.trimPrecision);
+			writer.writeAttribute("RespawnTime", this.pickupRespawnTime, options.trimPrecision);
+			
 			if (!options.skipNames) {
 				if (color != PickupPeer.defaultPickupColor) {
 					writer.writeAttribute(options.shortAttributes ? "c" : "color",
 							Integer.toHexString(color).toUpperCase());
 				}
 			}
-			if (frame != 0) {
-				writer.writeAttribute("frame", frame);
-			}
+			
+			writer.writeAttribute("turnCounter", turnCounter);
+			writer.writeAttribute("State", ""+this.getState());
+			
 			if (!options.skipVersion) {
 				writer.writeAttribute("ver", serialVersionUID);
 			}
@@ -197,12 +231,6 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 				reader.expect("id", new XmlReader.Attribute() {
 					public void read(String value) {
 						snapshot.pickupId = Integer.parseInt(value);
-					}
-				});
-
-				reader.expect("state", "s", new XmlReader.Attribute() {
-					public void read(String value) {
-						snapshot.state = PickupState.valueOf(value);
 					}
 				});
 
@@ -225,6 +253,18 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 						snapshot.paintY = snapshot.y;
 					}
 				});
+				
+				reader.expect("EnergyBonus", new XmlReader.Attribute() {
+					public void read(String value) {
+						snapshot.pickupEnergyBonus = Double.parseDouble(value);
+					}
+				});
+				
+				reader.expect("RespawnTime", new XmlReader.Attribute() {
+					public void read(String value) {
+						snapshot.pickupRespawnTime = Double.parseDouble(value);
+					}
+				});
 
 				reader.expect("color", "c", new XmlReader.Attribute() {
 					public void read(String value) {
@@ -232,9 +272,15 @@ final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IP
 					}
 				});
 
-				reader.expect("frame", new XmlReader.Attribute() {
+				reader.expect("TurnCounter", new XmlReader.Attribute() {
 					public void read(String value) {
-						snapshot.frame = Integer.parseInt(value);
+						snapshot.turnCounter = Integer.parseInt(value);
+					}
+				});
+
+				reader.expect("State", "s", new XmlReader.Attribute() {
+					public void read(String value) {
+						snapshot.state = PickupState.valueOf(value);
 					}
 				});
 				return snapshot;
