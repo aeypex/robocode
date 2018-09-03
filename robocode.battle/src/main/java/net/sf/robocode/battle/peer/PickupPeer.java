@@ -20,7 +20,6 @@ import java.util.List;
 /**
  * @author see Bullet (original)
  * @author Andreas Stock (contributor)
- * @since 1.9.3.2
  */
 public class PickupPeer {
 	
@@ -34,7 +33,7 @@ public class PickupPeer {
 	HALF_WIDTH_OFFSET = WIDTH / 2,
 	HALF_HEIGHT_OFFSET = HEIGHT / 2;
 
-	public static final int LOLN = 4; //so that randomized positions land more often to the middle. see "law of large numbers"
+	public static final int LOLN = 2; //so that randomized positions land more often to the middle. see "law of large numbers"
 
 	private final BattleRules battleRules;
 	private final int pickupId;

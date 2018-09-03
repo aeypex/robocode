@@ -34,6 +34,8 @@ public class ImageManager implements IImageManager {
 	private Image bodyImage;
 	private Image gunImage;
 	private Image radarImage;
+	
+	private Image pickupImage;
 
 	private static final int MAX_NUM_COLORS = 256;
 
@@ -232,5 +234,13 @@ public class ImageManager implements IImageManager {
 		protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
 			return size() > MAX_NUM_COLORS;
 		}
+	}
+
+	@Override
+	public Image getPickupImage() {
+		if (pickupImage == null) {
+			pickupImage = getImage("/net/sf/robocode/ui/images/pickup/"+ "power" + ".png");
+		}
+		return pickupImage;
 	}
 }

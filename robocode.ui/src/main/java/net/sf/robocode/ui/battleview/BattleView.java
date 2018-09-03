@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.battleview;
 
 
+import net.sf.robocode.battle.peer.PickupPeer;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
 import net.sf.robocode.robotpaint.IGraphicsProxy;
@@ -25,6 +26,7 @@ import robocode.control.events.BattleFinishedEvent;
 import robocode.control.events.BattleStartedEvent;
 import robocode.control.events.TurnEndedEvent;
 import robocode.control.snapshot.IBulletSnapshot;
+import robocode.control.snapshot.IPickupSnapshot;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
 
@@ -77,6 +79,7 @@ public class BattleView extends Canvas {
 	private boolean drawExplosions;
 	private boolean drawGround;
 	private boolean drawExplosionDebris;
+	private boolean drawPickups = true;
 
 	private int numBuffers = 2; // defaults to double buffering
 
@@ -310,7 +313,10 @@ public class BattleView extends Canvas {
 		if (snapShot != null) {
 			// Draw scan arcs
 			drawScanArcs(g, snapShot);
-
+			
+			// Draw active pickups
+			drawPickups(g, snapShot);
+			
 			// Draw robots
 			drawRobots(g, snapShot);
 
@@ -331,6 +337,26 @@ public class BattleView extends Canvas {
 
 		// Restore the graphics state
 		graphicsState.restore(g);
+	}
+
+	private void drawPickups(Graphics2D g, ITurnSnapshot snapShot) {
+		if(!drawPickups) {
+			return;
+		}
+		
+		double x, y;
+		int battleFieldHeight = battleField.getHeight();
+
+		for (IPickupSnapshot pickupSnapshot : snapShot.getPickups()) {
+			if (pickupSnapshot.getState().isActive()) {
+				x = pickupSnapshot.getX();
+				y = battleFieldHeight - pickupSnapshot.getY();
+
+				g.drawImage(imageManager.getPickupImage(), (int) x - PickupPeer.WIDTH/2, (int) y - PickupPeer.WIDTH/2, 
+						PickupPeer.WIDTH, PickupPeer.HEIGHT, null);
+
+			}
+		}
 	}
 
 	private void drawGround(Graphics2D g) {
