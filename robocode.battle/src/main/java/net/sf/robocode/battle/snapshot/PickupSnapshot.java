@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 final class PickupSnapshot implements java.io.Serializable, IXmlSerializable, IPickupSnapshot {
 
-	private static final long serialVersionUID = 2L; //??
+	private static final long serialVersionUID = 2L;
 
 	/** The pickup state */
 	private PickupState state;

@@ -102,6 +102,14 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	public IRobotSnapshot[] getRobots() {
 		return robots.toArray(new IRobotSnapshot[robots.size()]);
 	}
+	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public IPickupSnapshot[] getPickups() {
+		return pickups.toArray(new IPickupSnapshot[pickups.size()]);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -181,6 +189,7 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 		}
 	}
 
+	//TODO add pickups
 	/**
 	 * {@inheritDoc}
 	 */
@@ -217,6 +226,14 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 							rs.writeXml(writer, op);
 						}
 					}
+				}
+			}
+			writer.endElement();
+			
+			writer.startElement(options.shortAttributes ? "pu" : "pickups");{
+				for (IPickupSnapshot p : pickups) {
+					final PickupSnapshot ps = (PickupSnapshot) p;
+					ps.writeXml(writer, options);
 				}
 			}
 			writer.endElement();
@@ -286,6 +303,20 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 						}
 					}
 				});
+				
+				reader.expect("pickups", "pu", new XmlReader.ListElement() {
+					public IXmlSerializable read(XmlReader reader) {
+						snapshot.pickups = new ArrayList<IPickupSnapshot>();
+						// prototype
+						return new PickupSnapshot();
+					}
+
+					public void add(IXmlSerializable child) {
+						snapshot.pickups.add((PickupSnapshot) child);
+					}
+
+					public void close() {}
+				});
 
 				reader.expect("bullets", "bs", new XmlReader.ListElement() {
 					public IXmlSerializable read(XmlReader reader) {
@@ -305,4 +336,5 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 			}
 		});
 	}
+
 }

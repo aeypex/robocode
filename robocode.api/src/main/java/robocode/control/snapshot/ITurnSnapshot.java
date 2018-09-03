@@ -24,6 +24,13 @@ public interface ITurnSnapshot {
 	 * @return a list of snapshots for the robots participating in the battle. 
 	 */
 	IRobotSnapshot[] getRobots();
+	
+	/**
+	 * Returns a list of snapshots for the pickups participating in the battle. 
+	 *
+	 * @return a list of snapshots for the pickups participating in the battle. 
+	 */
+	IPickupSnapshot[] getPickups();
 
 	/**
 	 * Returns a list of snapshots for the bullets that are currently on the battlefield.
