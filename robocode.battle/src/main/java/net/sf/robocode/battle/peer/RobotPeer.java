@@ -942,7 +942,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
-	public void performScan(List<RobotPeer> robots) {
+	public void performScan(List<RobotPeer> robots, List<PickupPeer> pickups) {
 		if (isDead()) {
 			return;
 		}
@@ -950,7 +950,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		turnedRadarWithGun = false;
 		// scan
 		if (scan) {
-			scan(lastRadarHeading, robots);
+			scan(lastRadarHeading, robots, pickups);
 			turnedRadarWithGun = (lastGunHeading == lastRadarHeading) && (gunHeading == radarHeading);
 			scan = false;
 		}
@@ -1519,7 +1519,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
-	private void scan(double lastRadarHeading, List<RobotPeer> robots) {
+	private void scan(double lastRadarHeading, List<RobotPeer> robots, List<PickupPeer> pickups) {
 		if (statics.isDroid()) {
 			return;
 		}
@@ -1556,6 +1556,20 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 						normalRelativeAngle(angle - getBodyHeading()), dist, otherRobot.getBodyHeading(),
 						otherRobot.getVelocity(), otherRobot.isSentryRobot());
 
+				addEvent(event);
+			}
+		}
+		for (PickupPeer p : pickups) {
+			if(p != null && p.isActive()
+					&& intersects(scanArc, p.getBoundingBox())) {
+				double dx = p.getX() - x;
+				double dy = p.getY() - y;
+				double angle = atan2(dx, dy);
+				double dist = Math.hypot(dx, dy);
+				
+				final ScannedPickupEvent event = new ScannedPickupEvent(p.getPickupEnergyBonus(),
+						normalRelativeAngle(angle - getBodyHeading()), dist, p.getPickupRespawnTime());
+				
 				addEvent(event);
 			}
 		}
@@ -1631,7 +1645,12 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 	void updateEnergy(double delta) {
 		if ((!isExecFinishedAndDisabled && !isEnergyDrained) || delta < 0) {
-			setEnergy(energy + delta, true);
+			double newEnergy = energy + delta;
+			if(newEnergy > Rules.ROBOT_MAX_ENERGY) {
+				newEnergy = Rules.ROBOT_MAX_ENERGY;
+			}
+			setEnergy(newEnergy, true);
+			
 		}
 	}
 

@@ -1558,4 +1558,14 @@ public class Robot extends _Robot implements IInteractiveRobot, IPaintRobot, IBa
 	 * {@inheritDoc}
 	 */
 	public void onStatus(StatusEvent e) {}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void onScannedPickup(ScannedPickupEvent e) {}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void onPickup(PickupEvent e) {}
 }

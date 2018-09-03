@@ -19,8 +19,8 @@ import robocode.*;
  *
  * @author Pavel Savara (original)
  * @author Flemming N. Larsen (contributor)
+ * @author Andreas Stock (contributor)
  *
- * @since 1.6
  */
 public interface IBasicEvents {
 
@@ -213,7 +213,7 @@ public interface IBasicEvents {
 	 * Note that the robot's radar can only see robot within the range defined
 	 * by {@link Rules#RADAR_SCAN_RADIUS} (1200 pixels).
 	 * <p>
-	 * Also not that the bearing of the scanned robot is relative to your
+	 * Also note that the bearing of the scanned robot is relative to your
 	 * robot's heading.
 	 * <p>
 	 * Example:
@@ -275,4 +275,70 @@ public interface IBasicEvents {
 	 * @see Event
 	 */
 	void onWin(WinEvent event);
+
+	/**
+	 * This method is called when your robot sees a pickup, i.e. when the
+	 * robot's radar scan "hits" the pickup.
+	 * You should override it in your robot if you want to be informed of this
+	 * event. (Almost all robots should override this!)
+	 * <p>
+	 * This event is automatically called if there is a pickup in range of your
+	 * radar.
+	 * <p>
+	 * Note that the robot's radar can only see robot within the range defined
+	 * by {@link Rules#RADAR_SCAN_RADIUS} (1200 pixels).
+	 * <p>
+	 * Also note that the bearing of the scanned pickup is relative to your
+	 * robot's heading.
+	 * <p>
+	 * Example:
+	 * <pre>
+	 *   void onScannedPickup(ScannedPickupEvent event) {
+	 *       // Assuming radar and body are aligned...
+	 *       if (event.getDistance() < 100) {
+	 *           ahead(100);
+	 *       }
+	 *   }
+	 * </pre>
+	 *  <p>
+	 * <b>Note:</b><br>
+	 * <ul>
+	 * <li>If the body and radar are aligned (and were aligned last turn),
+	 * <li>which is often not the case,
+	 * <li>and the event is current,
+	 * <li>and you call ahead() before taking any other actions, {@link
+	 * Robot#ahead(double) ahead()} will move directly at the pickup.
+	 * </ul>
+	 * <p>
+	 * In essence, this means that if you can see a pickup, and nobody else picks it up,
+	 * then you are going to collect it.
+	 * <p>
+	 *
+	 * @param event the scanned-pickup event set by the game
+	 * @see ScannedPickupEvent
+	 * @see Event
+	 * @see Rules#RADAR_SCAN_RADIUS
+	 */
+	void onScannedPickup(ScannedPickupEvent scannedPickupEvent);
+
+	
+	/**
+	 * This method is called when your robot collects a pickup.
+	 * You should override it in your robot if you want to be informed of this
+	 * event.
+	 * <p>
+	 * Example:
+	 * <pre>
+	 *   void onPickup(PickupEvent event) {
+	 *       //save when you want to be here again.
+	 *       turn = event.getRespawnTime() + event.getTime();
+	 *       x = this.getX();
+	 *       y = this.getY();
+	 *   }
+	 * </pre>
+	 * @param event the pickup event set by the game
+	 * @see PickupEvent
+	 * @see Event
+	 */
+	void onPickup(PickupEvent pickupEvent);
 }

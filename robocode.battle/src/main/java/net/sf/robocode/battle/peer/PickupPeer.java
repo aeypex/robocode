@@ -118,12 +118,10 @@ public class PickupPeer {
 						"SYSTEM: Pickup Bonus for "
 								+ (victim.getNameForEvent(otherRobot) + ": " + (int) (energyGain + .5)));
 
-				/* 
-				 *  otherRobot.addEvent(
-						new HitByBulletEvent(
-								robocode.util.Utils.normalRelativeAngle(heading + Math.PI - otherRobot.getBodyHeading()),
-								createBullet(true))); // Bugfix #366
-				*/
+				otherRobot.addEvent(
+						new PickupEvent(this.getPickupEnergyBonus(), this.getPickupRespawnTime())
+						);
+				
 
 				break;
 			}

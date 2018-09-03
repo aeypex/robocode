@@ -152,12 +152,12 @@ public final class Rules {
 	/**
 	 * The amount of Energy gained by picking up the Item.
 	 */
-	public static final double PICKUP_ENERGY_BONUS = 50;
+	public static final double PICKUP_ENERGY_BONUS = 10;
 	
 	/**
 	 * The amount of Turns after picking up the Item, before its available again.
 	 */
-	public static final int PICKUP_RESPAWN_TIME = 100;
+	public static final int PICKUP_RESPAWN_TIME = 200;
 
 	/**
 	 * Returns the turn rate of a robot given a specific velocity measured in
