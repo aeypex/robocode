@@ -9,6 +9,9 @@ package robocode;
 
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import net.sf.robocode.security.IHiddenRulesHelper;
 import robocode.control.RandomFactory;
@@ -151,29 +154,80 @@ public final class BattleRules implements java.io.Serializable {
 
 
 	/**
+	 * Note: its not efficient to run this code with large numbers.
 	 * 
-	 * @param width minimal distance to border
-	 * @param height minimal distance to border 
+	 * @param minimaldistance minimal distance to border or other positions see nonOverlapControlGroup
 	 * @param loln 1 is normal. set higher (ie. 10) so that position is more in middle. see law of large numbers.
+	 * @param nonOverlapControlGroup other points that you may want to not overlap. set null if you dont care about them.
 	 * @return a random position on the specified battlefield
 	 * 
 	 * @author Andreas Stock
 	 */
-	public Point2D calculateRandomPosition(int width, int height, int loln) {
+	public Point2D calculateRandomPosition(double minimaldistance, int loln, List<Point2D> nonOverlapControlGroup) {
 		final Random random = RandomFactory.getRandom();
 		
-		double rndX = random.nextDouble();
-		double rndY = random.nextDouble(); 
-		for (int i = 0; i < loln-1; i++) {
-			rndX += random.nextDouble();
-			rndY += random.nextDouble();
+		Point2D p = new Point2D.Double();
+		int fails=0;
+		boolean overlaps = false;
+		do {
+			overlaps = false;
+			double rndX = random.nextDouble();
+			double rndY = random.nextDouble();
+			for (int i = 0; i < loln - 1; i++) {
+				rndX += random.nextDouble();
+				rndY += random.nextDouble();
+			}
+			rndX /= loln;
+			rndY /= loln;
+			double x = minimaldistance/2 + rndX * (getBattlefieldWidth() - minimaldistance);
+			double y = minimaldistance/2 + rndY * (getBattlefieldHeight() - minimaldistance);
+			p = new Point2D.Double(x, y);
+			
+			if (nonOverlapControlGroup != null) {
+				for (Point2D controlpoint : nonOverlapControlGroup) {
+					if (Math.abs(p.getX()-controlpoint.getX()) < minimaldistance
+							|| Math.abs(p.getY()-controlpoint.getY()) < minimaldistance) {
+						overlaps = true;
+						fails++;
+					}
+				} 
+			}
+			
+		} while (fails < 100 
+				&& 
+				overlaps);
+		
+		return p;
+	}
+
+	/**
+	 * divides battlefield into columns and rows, then shuffles them. each intersection is a point.
+	 * @param n number of points
+	 * @return a list of points
+	 */
+	public List<Point2D> calculateEqualyDistributedPoints2D(int n) {
+		if (n < 1) {
+			return null;
 		}
-		rndX /= loln;
-		rndY /= loln;
 		
-		double x = width + rndX * (getBattlefieldWidth() - 2 * width);
-		double y = height + rndY * (getBattlefieldHeight() - 2 * height);
+		List<Point2D> r = new ArrayList<Point2D>(n);
+		List<Double> x = new ArrayList<Double>(n);
+		List<Double> y = new ArrayList<Double>(n);
 		
-		return new Point2D.Double(x,y);
+		double stepX = this.battlefieldWidth/(n+1), currentX = 0, 
+				stepY = this.battlefieldHeight/(n+1), currentY = 0;
+		for (int i = 0; i < n; i++) {
+			currentX += stepX;
+			currentY += stepY;
+			x.add(currentX);
+			y.add(currentY);
+		}
+		Collections.shuffle(x, RandomFactory.getRandom());
+		Collections.shuffle(y, RandomFactory.getRandom());
+		for (int i = 0; i < n; i++) {
+			r.add(new Point2D.Double(x.get(i), y.get(i)));
+		}
+		return r;
+		
 	}
 }

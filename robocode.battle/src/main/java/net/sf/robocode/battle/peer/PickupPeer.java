@@ -33,7 +33,7 @@ public class PickupPeer {
 	HALF_WIDTH_OFFSET = WIDTH / 2,
 	HALF_HEIGHT_OFFSET = HEIGHT / 2;
 
-	public static final int LOLN = 1; //so that randomized positions land more often to the middle. see "law of large numbers"
+	public static final int LOLN = 2; //so that randomized positions land more often to the middle. see "law of large numbers"
 
 	private final BattleRules battleRules;
 	private final int pickupId;
@@ -86,7 +86,7 @@ public class PickupPeer {
 	}
 
 	private void calculateRandomPosition() {
-		Point2D p = battleRules.calculateRandomPosition(WIDTH,HEIGHT,LOLN);
+		Point2D p = battleRules.calculateRandomPosition(Math.max(WIDTH,HEIGHT),LOLN,null);
 		this.x = p.getX();
 		this.y = p.getY();
 	}

@@ -874,9 +874,10 @@ public final class Battle extends BaseBattle {
 
 		String[] coords;
 		double x=0, y=0, energygain = 0, respawntime=0;
+		List<Point2D> points = battleRules.calculateEqualyDistributedPoints2D(max);
 		
 		for (int i = 0; i < thePickupSetups.length; i++) {
-			Point2D p = battleRules.calculateRandomPosition(PickupPeer.WIDTH, PickupPeer.HEIGHT, PickupPeer.LOLN);
+			Point2D p = points.get(i);
 			x = p.getX();
 			y = p.getY();
 			energygain = battleProps.getPickupEnergyBonus();
