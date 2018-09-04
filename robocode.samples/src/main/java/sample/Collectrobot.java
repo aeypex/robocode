@@ -15,9 +15,9 @@ public class Collectrobot extends Robot
 	 */
 	public void run() {
 		// Set colors
-		setBodyColor(new Color(0, 0, 0));
+		setBodyColor(new Color(252, 151, 63));
 		setGunColor(new Color(255, 255, 255));
-		setRadarColor(new Color(255, 0, 0));
+		setRadarColor(new Color(99, 175, 54));
 		
 		while(true) {
 			turnGunLeft(90);
