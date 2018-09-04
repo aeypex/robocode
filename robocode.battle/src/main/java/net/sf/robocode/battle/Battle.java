@@ -118,12 +118,6 @@ public final class Battle extends BaseBattle {
 				pickups.add(pickupPeer);
 			}
 		}
-		/*
-		//if there are not enough setups specified, create the rest randomly
-		for (int i = pickups.size(); i < pickupsCount; i++) {
-			final PickupPeer pickupPeer = new PickupPeer(battleRules,pickups.size());
-			pickups.add(pickupPeer);
-		}*/
 	}
 
 	private void createPeers(RobotSpecification[] battlingRobotsList) {
@@ -585,6 +579,18 @@ public final class Battle extends BaseBattle {
 	}
 
 	/**
+	 * Returns a list of all pickups in random order. This method is used to gain fair play in Robocode.
+	 *
+	 * @return a list of pickup peers.
+	 */
+	private List<PickupPeer> getPickupsAtRandom() {
+		List<PickupPeer> shuffledList = new ArrayList<PickupPeer>(pickups);
+
+		Collections.shuffle(shuffledList, RandomFactory.getRandom());
+		return shuffledList;
+	}
+	
+	/**
 	 * Returns a list of all bullets in random order. This method is used to gain fair play in Robocode.
 	 *
 	 * @return a list of bullet peers.
@@ -625,8 +631,10 @@ public final class Battle extends BaseBattle {
 	}
 	
 	private void updatePickups() {
-		for (PickupPeer p : pickups) {
-			p.update(getRobotsAtRandom());
+		for (PickupPeer p : getPickupsAtRandom()) {
+			if (p.getState() != PickupState.INACTIVE) {
+				p.update(getRobotsAtRandom());
+			}
 			if (p.getState() == PickupState.REMOVE) {
 				pickups.remove(p);
 			}
@@ -645,7 +653,7 @@ public final class Battle extends BaseBattle {
 
 		// Scan after moved all
 		for (RobotPeer robotPeer : getRobotsAtRandom()) {
-			robotPeer.performScan(getRobotsAtRandom(), pickups);
+			robotPeer.performScan(getRobotsAtRandom(), getPickupsAtRandom());
 		}
 	}
 
@@ -843,26 +851,26 @@ public final class Battle extends BaseBattle {
 		PickupSetup[] thePickupSetups = null;
 
 		String battlePropsPickupSpec = battleProps.getInitialPickupSpecification();
-		if (battlePropsPickupSpec  == null || battlePropsPickupSpec.trim().length() == 0) {
-			return null;
-		}
+		
 
 		List<String> positions = new ArrayList<String>();
 
-		Pattern pattern = Pattern.compile("([^,(]*[(][^)]*[)])?[^,]*,?");
-		Matcher matcher = pattern.matcher(battlePropsPickupSpec);
+		if (battlePropsPickupSpec  != null && battlePropsPickupSpec.trim().length() != 0) {
+			Pattern pattern = Pattern.compile("([^,(]*[(][^)]*[)])?[^,]*,?");
+			Matcher matcher = pattern.matcher(battlePropsPickupSpec);
 
-		while (matcher.find()) {
-			String pos = matcher.group();
-			if (pos.length() > 0) {
-				positions.add(pos);
+			while (matcher.find()) {
+				String pos = matcher.group();
+				if (pos.length() > 0) {
+					positions.add(pos);
+				}
 			}
 		}
-		if (positions.size() == 0) {
+		
+		int max = Math.max(positions.size(),battleProps.getNumPickups());
+		if(max ==0)
 			return null;
-		}
-
-		thePickupSetups = new PickupSetup[Math.max(positions.size(),battleProps.getNumPickups())];
+		thePickupSetups = new PickupSetup[max];
 
 		String[] coords;
 		double x=0, y=0, energygain = 0, respawntime=0;
@@ -884,32 +892,31 @@ public final class Battle extends BaseBattle {
 			int j = 0;
 			if (len >= j+1 && coords[j].trim().length() > 0) {
 				try {
-					x = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+					thePickupSetups[i].setX(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 				} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 				}
 				j++;
 				if (len >= j+1 && coords[j].trim().length() > 0) {
 					try {
-						y = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+						thePickupSetups[i].setY(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 					} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 					}
 					j++;
 					if (len >= j+1 && coords[j].trim().length() > 0) {
 						try {
-							energygain = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+							thePickupSetups[i].setEnergyBonus(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 						} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 						}
 						j++;
 						if (len >= j+1 && coords[j].trim().length() > 0) {
 							try {
-								respawntime = Double.parseDouble(coords[j].replaceAll("[^0-9.]", ""));
+								thePickupSetups[i].setRespawnTime(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 							} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 							}
 						}
 					}
 				}
 			}
-			thePickupSetups[i] = new PickupSetup(x, y, energygain, respawntime);
 		}
 		return thePickupSetups;
 	}

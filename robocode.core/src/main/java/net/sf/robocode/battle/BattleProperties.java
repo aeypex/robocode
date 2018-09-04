@@ -25,6 +25,7 @@ import java.util.Properties;
 /**
  * @author Mathew A. Nelson (original)
  * @author Flemming N. Larsen (contributor)
+ * @author Andreas Stock (contributor)
  */
 public class BattleProperties implements Serializable {
 

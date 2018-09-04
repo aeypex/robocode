@@ -33,7 +33,7 @@ public class PickupPeer {
 	HALF_WIDTH_OFFSET = WIDTH / 2,
 	HALF_HEIGHT_OFFSET = HEIGHT / 2;
 
-	public static final int LOLN = 2; //so that randomized positions land more often to the middle. see "law of large numbers"
+	public static final int LOLN = 1; //so that randomized positions land more often to the middle. see "law of large numbers"
 
 	private final BattleRules battleRules;
 	private final int pickupId;
@@ -69,8 +69,8 @@ public class PickupPeer {
 		} else {
 			calculateRandomPosition();
 		}
-		this.pickupEnergyBonus = ps.getEnergygain();
-		this.pickupRespawnTime = ps.getRespawntime();
+		this.pickupEnergyBonus = ps.getEnergyBonus();
+		this.pickupRespawnTime = ps.getRespawnTime();
 		
 		updateBoundingBox();
 	}

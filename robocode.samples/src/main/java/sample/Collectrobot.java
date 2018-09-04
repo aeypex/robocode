@@ -5,12 +5,10 @@ import robocode.*;
 
 
 /**
- * GoPickup - a robot by Andreas Stock
+ * Collectrobot - a sample robot by Andreas Stock
  */
-public class GoPickup extends Robot
+public class Collectrobot extends Robot
 {
-	double turn = 0;
-	double travel = 0;
 	
 	/**
 	 * run: GoMiddle's default behavior
@@ -21,11 +19,8 @@ public class GoPickup extends Robot
 		setGunColor(new Color(255, 255, 255));
 		setRadarColor(new Color(255, 0, 0));
 		
-		turnGunRight(360);
 		while(true) {
-			turnRight(turn);
-			ahead(travel);
-			turnGunLeft(360);
+			turnGunLeft(90);
 		}
 	}
 	
@@ -33,9 +28,13 @@ public class GoPickup extends Robot
 	 * onScannedPickup: Go!
 	 */
 	public void onScannedPickup(ScannedPickupEvent e) {
-		turn = e.getBearing();
-		travel = e.getDistance();
+		//face forward
+		turnRight(e.getBearing());
+		turnGunLeft(getGunHeading()-getHeading());
+		//and go!
+		ahead(e.getDistance());
 	}
+	
 
 	/**
 	 * onScannedRobot: Fire!
@@ -43,4 +42,5 @@ public class GoPickup extends Robot
 	public void onScannedRobot(ScannedRobotEvent event) {
 		fire(3);
 	}
+	
 }
