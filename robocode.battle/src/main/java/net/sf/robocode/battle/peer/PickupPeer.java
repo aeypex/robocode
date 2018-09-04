@@ -53,7 +53,7 @@ public class PickupPeer {
 	/**
 	 * The amount of Turns after picking up the Item, before its available again.
 	 */
-	private double pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
+	private long pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
 	
 	private final BoundingRectangle boundingBox;
 
@@ -117,11 +117,10 @@ public class PickupPeer {
 						"SYSTEM: Pickup Bonus for "
 								+ (victim.getNameForEvent(otherRobot) + ": " + (int) (energyGain + .5)));
 
-				otherRobot.addEvent(
-						new PickupEvent(this.getPickupEnergyBonus(), this.getPickupRespawnTime())
-						);
-				
-
+				for (RobotPeer r : robots) {
+					r.addEvent(new PickupEvent(this.getPickupEnergyBonus(), this.getPickupRespawnTime(),
+							otherRobot.getName(), this.getPickupId()));
+				}
 				break;
 			}
 		}
@@ -159,7 +158,7 @@ public class PickupPeer {
 		return pickupEnergyBonus;
 	}
 
-	public double getPickupRespawnTime() {
+	public long getPickupRespawnTime() {
 		return pickupRespawnTime;
 	}
 

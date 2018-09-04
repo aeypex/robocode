@@ -873,7 +873,8 @@ public final class Battle extends BaseBattle {
 		thePickupSetups = new PickupSetup[max];
 
 		String[] coords;
-		double x=0, y=0, energygain = 0, respawntime=0;
+		double x=0, y=0, energygain = 0;
+		long respawntime=0;
 		List<Point2D> points = battleRules.calculateEqualyDistributedPoints2D(max);
 		
 		for (int i = 0; i < thePickupSetups.length; i++) {
@@ -911,7 +912,7 @@ public final class Battle extends BaseBattle {
 						j++;
 						if (len >= j+1 && coords[j].trim().length() > 0) {
 							try {
-								thePickupSetups[i].setRespawnTime(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
+								thePickupSetups[i].setRespawnTime(Long.parseLong(coords[j].replaceAll("[^0-9.]", "")));
 							} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 							}
 						}

@@ -33,8 +33,9 @@ import java.nio.ByteBuffer;
  */
 public class ScannedPickupEvent extends Event {
 	private static final long serialVersionUID = 1L;
-	private final static int DEFAULT_PRIORITY = 10;
+	private final static int DEFAULT_PRIORITY = 11;
 
+	private final int id;
 	private final double energyBonus;
 	private final double bearing;
 	private final double distance;
@@ -46,14 +47,20 @@ public class ScannedPickupEvent extends Event {
 	 * @param energyBonus   the energy of the scanned pickup
 	 * @param bearing  the bearing of the scanned pickup, in radians
 	 * @param distance the distance from your robot to the scanned pickup
+	 * @param id TODO
 	 * 
 	 */
-	public ScannedPickupEvent(double energyBonus, double bearing, double distance, double respawnTime) {
+	public ScannedPickupEvent(double energyBonus, double bearing, double distance, double respawnTime, int id) {
 		super();
+		this.id = id;
 		this.energyBonus = energyBonus;
 		this.bearing = bearing;
 		this.distance = distance;
 		this.respawnTime = respawnTime;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	/**
@@ -169,7 +176,7 @@ public class ScannedPickupEvent extends Event {
 			double distance = buffer.getDouble();
 			double respawnTime = buffer.getDouble();
 
-			return new ScannedPickupEvent(energybonus, bearing, distance, respawnTime);
+			return new ScannedPickupEvent(energybonus, bearing, distance, respawnTime, -1);
 		}
 	}
 }

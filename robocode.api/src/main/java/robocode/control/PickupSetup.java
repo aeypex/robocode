@@ -26,7 +26,7 @@ public class PickupSetup implements java.io.Serializable {
 
 	private double energyBonus = Rules.PICKUP_ENERGY_BONUS;
 
-	private double respawnTime = Rules.PICKUP_RESPAWN_TIME;
+	private long respawnTime = Rules.PICKUP_RESPAWN_TIME;
 
 	/**
 	 * Constructs a new PickupSetup.
@@ -39,7 +39,7 @@ public class PickupSetup implements java.io.Serializable {
 		this.y = y;
 	}
 
-	public PickupSetup(double x2, double y2, double energygain, double respawntime) {
+	public PickupSetup(double x2, double y2, double energygain, long respawntime) {
 		this(x2,y2);
 		this.energyBonus = energygain;
 		this.respawnTime = respawntime;
@@ -65,7 +65,7 @@ public class PickupSetup implements java.io.Serializable {
 		return energyBonus;
 	}
 
-	public double getRespawnTime() {
+	public long getRespawnTime() {
 		return respawnTime;
 	}
 
@@ -81,7 +81,7 @@ public class PickupSetup implements java.io.Serializable {
 		this.energyBonus = energyBonus;
 	}
 
-	public void setRespawnTime(double respawnTime) {
+	public void setRespawnTime(long respawnTime) {
 		this.respawnTime = respawnTime;
 	}
 

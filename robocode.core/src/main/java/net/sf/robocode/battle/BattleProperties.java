@@ -59,7 +59,7 @@ public class BattleProperties implements Serializable {
 	
 	private String initialPickupSpecification;
 	private double pickupEnergyBonus = Rules.PICKUP_ENERGY_BONUS;
-	private double pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
+	private long pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
 	private int numPickups = 1;
 
 	private final Properties props = new Properties();
@@ -378,11 +378,11 @@ public class BattleProperties implements Serializable {
 		this.pickupEnergyBonus = pickupEnergyBonus;
 	}
 
-	public double getPickupRespawnTime() {
+	public long getPickupRespawnTime() {
 		return pickupRespawnTime;
 	}
 
-	public void setPickupRespawnTime(double pickupRespawnTime) {
+	public void setPickupRespawnTime(long pickupRespawnTime) {
 		this.pickupRespawnTime = pickupRespawnTime;
 	}
 
@@ -402,7 +402,7 @@ public class BattleProperties implements Serializable {
 		initialPositions = props.getProperty(BATTLE_INITIAL_POSITIONS, "");
 		numPickups = Integer.parseInt(props.getProperty(BATTLE_NUMPICKUPS, "0"));
 		pickupEnergyBonus = Double.parseDouble(props.getProperty(BATTLE_PICKUP_ENERGY_BONUS, ""+Rules.PICKUP_ENERGY_BONUS));
-		pickupRespawnTime = Double.parseDouble(props.getProperty(BATTLE_RESPAWN_TIME, ""+Rules.PICKUP_RESPAWN_TIME));
+		pickupRespawnTime = Long.parseLong(props.getProperty(BATTLE_RESPAWN_TIME, ""+Rules.PICKUP_RESPAWN_TIME));
 		initialPickupSpecification = props.getProperty(BATTLE_INITIAL_PICKUP_SPECIFICATION, "");
 		sentryBorderSize = Integer.parseInt(props.getProperty(BATTLE_SENTRY_BORDER_SIZE, "100"));
 	}

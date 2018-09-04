@@ -36,20 +36,37 @@ public class PickupEvent extends Event {
 	private final static int DEFAULT_PRIORITY = 10;
 
 	private final double energyBonus;
-	private final double respawnTime;
+	private final long respawnTime;
+	private final String name;
+	private final int id;
+	
 
+	
 	/**
-	 * Called by the game to create a new ScannedPickupEvent.
-	 *
-	 * @param energybonus   the energy of the scanned pickup
-	 * @param bearing  the bearing of the scanned pickup, in radians
-	 * @param distance the distance from your robot to the scanned pickup
-	 * 
+	 * @param energybonus
+	 * @param respawnTime
+	 * @param robotname
+	 * @param id
 	 */
-	public PickupEvent(double energybonus, double respawnTime) {
+	public PickupEvent(double energybonus, long respawnTime, String robotname, int id) {
 		super();
 		this.energyBonus = energybonus;
 		this.respawnTime = respawnTime;
+		this.name = robotname;
+		this.id = id;
+	}
+
+	/**
+	 * Returns the name of the robot.
+	 *
+	 * @return the name of the robot
+	 */
+	public String getName() {
+		return name;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	/**
@@ -64,7 +81,7 @@ public class PickupEvent extends Event {
 	/**
 	 * @return Turns until this pickup will be available again.
 	 */
-	public double getRespawnTime() {
+	public long getRespawnTime() {
 		return respawnTime;
 	}
 
@@ -119,20 +136,25 @@ public class PickupEvent extends Event {
 
 	private static class SerializableHelper implements ISerializableHelper {
 		public int sizeOf(RbSerializer serializer, Object object) {
-			return RbSerializer.SIZEOF_TYPEINFO + 2 * RbSerializer.SIZEOF_DOUBLE;
+			PickupEvent obj = (PickupEvent) object;
+			return RbSerializer.SIZEOF_TYPEINFO + serializer.sizeOf(obj.name) + RbSerializer.SIZEOF_DOUBLE + RbSerializer.SIZEOF_LONG + RbSerializer.SIZEOF_INT;
 		}
 
 		public void serialize(RbSerializer serializer, ByteBuffer buffer, Object object) {
 			PickupEvent obj = (PickupEvent) object;
+			serializer.serialize(buffer, obj.name);
+			serializer.serialize(buffer, obj.id);
 			serializer.serialize(buffer, obj.energyBonus);
 			serializer.serialize(buffer, obj.respawnTime);
 		}
 
 		public Object deserialize(RbSerializer serializer, ByteBuffer buffer) {
+			String name = serializer.deserializeString(buffer);
+			int id = buffer.getInt();
 			double energybonus = buffer.getDouble();
-			double respawnTime = buffer.getDouble();
+			long respawnTime = buffer.getLong();
 
-			return new PickupEvent(energybonus, respawnTime);
+			return new PickupEvent(energybonus, respawnTime, name, id);
 		}
 	}
 }

@@ -1568,7 +1568,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 				double dist = Math.hypot(dx, dy);
 				
 				final ScannedPickupEvent event = new ScannedPickupEvent(p.getPickupEnergyBonus(),
-						normalRelativeAngle(angle - getBodyHeading()), dist, p.getPickupRespawnTime());
+						normalRelativeAngle(angle - getBodyHeading()), dist, p.getPickupRespawnTime(), p.getPickupId());
 				
 				addEvent(event);
 			}
