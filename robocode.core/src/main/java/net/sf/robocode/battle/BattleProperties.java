@@ -60,7 +60,7 @@ public class BattleProperties implements Serializable {
 	private String initialPickupSpecification;
 	private double pickupEnergyBonus = Rules.PICKUP_ENERGY_BONUS;
 	private long pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
-	private int numPickups = 1;
+	private int numPickups = 0;
 
 	private final Properties props = new Properties();
 

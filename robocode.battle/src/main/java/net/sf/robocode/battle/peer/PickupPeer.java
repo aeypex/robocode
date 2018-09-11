@@ -114,7 +114,7 @@ public class PickupPeer {
 				otherRobot.updateEnergy(energyGain);
 				
 				victim.println(
-						"SYSTEM: Pickup Bonus for "
+						"SYSTEM: Pickup Bonus for Robot"
 								+ (victim.getNameForEvent(otherRobot) + ": " + (int) (energyGain + .5)));
 
 				for (RobotPeer r : robots) {

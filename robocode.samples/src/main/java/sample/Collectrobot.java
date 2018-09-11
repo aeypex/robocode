@@ -20,7 +20,8 @@ public class Collectrobot extends Robot
 		setRadarColor(new Color(99, 175, 54));
 		
 		while(true) {
-			turnGunLeft(90);
+			//scans automatic
+			turnGunLeft(10);
 		}
 	}
 	

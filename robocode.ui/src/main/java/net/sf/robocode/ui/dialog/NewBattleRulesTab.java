@@ -51,12 +51,14 @@ public class NewBattleRulesTab extends JPanel {
 	private final JLabel inactivityTimeLabel = new JLabel("Inactivity Time:");
 	private final JLabel sentryBorderSizeLabel = new JLabel("Sentry Border Size");
 	private final JLabel hideEnemyNamesLabel = new JLabel("Hide Enemy Names:");
+	private final JLabel numberOfPickupsLabel = new JLabel("Number of Pickups:");
 
 	private final JButton restoreDefaultsButton = new JButton("Restore Defaults");
 	
 	private JTextField numberOfRoundsTextField;
 	private JTextField gunCoolingRateTextField;
 	private JTextField inactivityTimeTextField;
+	private JTextField numberOfPickupsTextField;
 	private JTextField sentryBorderSizeTextField;
 	private final JCheckBox hideEnemyNamesCheckBox = new JCheckBox();
 
@@ -189,6 +191,7 @@ public class NewBattleRulesTab extends JPanel {
 		left.addComponent(inactivityTimeLabel);
 		left.addComponent(sentryBorderSizeLabel);
 		left.addComponent(hideEnemyNamesLabel);
+		left.addComponent(numberOfPickupsLabel);
 		leftToRight.addGroup(left);
 		
 		GroupLayout.ParallelGroup right = layout.createParallelGroup();
@@ -196,6 +199,7 @@ public class NewBattleRulesTab extends JPanel {
 		right.addComponent(getGunCoolingRateTextField());
 		right.addComponent(getInactivityTimeTextField());
 		right.addComponent(getSentryBorderSizeTextField());
+		right.addComponent(getNumberOfPickupsTextField());
 		right.addComponent(hideEnemyNamesCheckBox);
 		leftToRight.addGroup(right);
 		
@@ -225,6 +229,11 @@ public class NewBattleRulesTab extends JPanel {
 		row4.addComponent(hideEnemyNamesLabel);
 		row4.addComponent(hideEnemyNamesCheckBox);
 		topToBottom.addGroup(row4);
+		
+		GroupLayout.ParallelGroup row5 = layout.createParallelGroup(Alignment.BASELINE);
+		row5.addComponent(numberOfPickupsLabel);
+		row5.addComponent(numberOfPickupsTextField);
+		topToBottom.addGroup(row5);
 
 		layout.setHorizontalGroup(leftToRight);
 		layout.setVerticalGroup(topToBottom);
@@ -340,6 +349,33 @@ public class NewBattleRulesTab extends JPanel {
 		}
 		return sentryBorderSizeTextField;
 	}
+	
+	private JTextField getNumberOfPickupsTextField() {
+		if (numberOfPickupsTextField == null) {
+			numberOfPickupsTextField = new JTextField(5);
+			numberOfPickupsTextField.setText("" + battleProperties.getNumPickups());
+			numberOfPickupsTextField.setInputVerifier(
+					new InputVerifier() {
+				@Override
+				public boolean verify(JComponent input) {
+					boolean isValid = false;
+
+					String text = ((JTextField) input).getText();
+					if (text != null && text.matches("\\d+")) {
+						int numPickups = Integer.parseInt(text);
+						isValid = (numPickups >= 0);
+					}
+					if (!isValid) {
+						WindowUtil.messageError(
+								"'Number of Pickups' must be an integer value >= 0.\n" + "Default value is 0.");
+						numberOfPickupsTextField.setText("" + battleProperties.getNumPickups());
+					}
+					return isValid;
+				}
+			});
+		}
+		return numberOfPickupsTextField;
+	}
 
 	private JSlider createBattlefieldSizeSlider() {
 		JSlider slider = new JSlider();
@@ -418,6 +454,16 @@ public class NewBattleRulesTab extends JPanel {
 				settingsManager.setBattleDefaultSentryBorderSize(sentryBorderSize);
 				battleProperties.setSentryBorderSize(sentryBorderSize);
 			}
+			Integer numberOfPickups;
+			try {
+				numberOfPickups = Integer.parseInt(getNumberOfPickupsTextField().getText());
+			} catch (NumberFormatException e) {
+				numberOfPickups = null;
+			}
+			if (numberOfPickups != null) {
+				//TODO settingsManager.getBattleDefaultNumberOfPickups():
+				battleProperties.setNumPickups(numberOfPickups);
+			}
 			boolean hideEnemyNames = hideEnemyNamesCheckBox.isSelected();
 			settingsManager.setBattleDefaultHideEnemyNames(hideEnemyNames);
 			battleProperties.setHideEnemyNames(hideEnemyNames);
@@ -451,6 +497,7 @@ public class NewBattleRulesTab extends JPanel {
 				battleProperties.setInactivityTime(450);
 				battleProperties.setHideEnemyNames(false);
 				battleProperties.setSentryBorderSize(100);
+				battleProperties.setNumPickups(0);
 
 				pushBattlePropertiesToUIComponents();
 			}
@@ -472,6 +519,7 @@ public class NewBattleRulesTab extends JPanel {
 			getGunCoolingRateTextField().setText("" + battleProperties.getGunCoolingRate());
 			getInactivityTimeTextField().setText("" + battleProperties.getInactivityTime());
 			getSentryBorderSizeTextField().setText("" + battleProperties.getSentryBorderSize());
+			getNumberOfPickupsTextField().setText("" + battleProperties.getNumPickups());
 			hideEnemyNamesCheckBox.setSelected(battleProperties.getHideEnemyNames());
 		}
 	}
