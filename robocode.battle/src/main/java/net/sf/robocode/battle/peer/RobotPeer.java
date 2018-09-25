@@ -1646,9 +1646,6 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 	void updateEnergy(double delta) {
 		if ((!isExecFinishedAndDisabled && !isEnergyDrained) || delta < 0) {
 			double newEnergy = energy + delta;
-			if(newEnergy > Rules.ROBOT_MAX_ENERGY) {
-				newEnergy = Rules.ROBOT_MAX_ENERGY;
-			}
 			setEnergy(newEnergy, true);
 			
 		}

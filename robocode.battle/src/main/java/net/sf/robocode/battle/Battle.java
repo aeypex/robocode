@@ -631,9 +631,11 @@ public final class Battle extends BaseBattle {
 	}
 	
 	private void updatePickups() {
+		boolean respawnBlocked = (this.currentTime > Rules.PICKUP_BLOCK_RESPAWN_AT_MAX_TURNS);
+		
 		for (PickupPeer p : getPickupsAtRandom()) {
 			if (p.getState() != PickupState.INACTIVE) {
-				p.update(getRobotsAtRandom());
+				p.update(getRobotsAtRandom(), respawnBlocked);
 			}
 			if (p.getState() == PickupState.REMOVE) {
 				pickups.remove(p);

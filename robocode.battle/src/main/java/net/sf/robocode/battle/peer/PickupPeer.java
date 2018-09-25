@@ -192,19 +192,21 @@ public class PickupPeer {
 		state = newState;
 	}
 
-	public void update(List<RobotPeer> robots) {
-		turnCounter++;
+	public void update(List<RobotPeer> robots, boolean respawnBlocked) {
+		if (!respawnBlocked) {
+			turnCounter++;
+		}
 		if (isActive()) {
 			checkRobotCollision(robots);
 		}
-		updatePickupState();
+		updatePickupState(respawnBlocked);
 	}
 
-	protected void updatePickupState() {
+	protected void updatePickupState(boolean respawnBlocked) {
 		switch (state) {
 		case SPAWNED:
 			// Note that the Pickup must be in the SPAWNED state before it goes to the AVAILABLE state
-			if (turnCounter > 0) {
+			if (turnCounter >= 0) {
 				state = PickupState.AVAILABLE;
 			}
 			break;
@@ -220,9 +222,11 @@ public class PickupPeer {
 			break;
 			
 		case UNAVAILABLE:
-			if (turnCounter >= this.pickupRespawnTime) {
-				state = PickupState.SPAWNED;
-				turnCounter = 0;
+			if (!respawnBlocked) {
+				if (turnCounter >= this.pickupRespawnTime) {
+					state = PickupState.SPAWNED;
+					turnCounter = 0;
+				} 
 			}
 			break;
 

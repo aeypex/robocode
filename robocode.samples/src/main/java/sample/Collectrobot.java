@@ -31,7 +31,6 @@ public class Collectrobot extends Robot
 	public void onScannedPickup(ScannedPickupEvent e) {
 		//face forward
 		turnRight(e.getBearing());
-		turnGunLeft(getGunHeading()-getHeading());
 		//and go!
 		ahead(e.getDistance());
 	}
