@@ -92,12 +92,12 @@ public class JuniorEvents implements IJuniorRobot, IBasicEvents, Runnable {
 	public void onHitWall(HitWallEvent event) {
 		count(event);
 	}
-	public void onScannedPickup(ScannedPickupEvent scannedPickupEvent) {
+	public void onScannedPowerup(ScannedPowerupEvent scannedPowerupEvent) {
 		
 	}
 
 	
-	public void onPickup(PickupEvent pickupEvent) {
+	public void onPowerup(PowerupEvent powerupEvent) {
 		
 		
 	}

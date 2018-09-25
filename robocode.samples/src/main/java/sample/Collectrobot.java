@@ -28,7 +28,7 @@ public class Collectrobot extends Robot
 	/**
 	 * onScannedPickup: Go!
 	 */
-	public void onScannedPickup(ScannedPickupEvent e) {
+	public void onScannedPowerup(ScannedPowerupEvent e) {
 		//face forward
 		turnRight(e.getBearing());
 		//and go!

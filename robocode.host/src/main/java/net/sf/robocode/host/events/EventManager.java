@@ -536,8 +536,8 @@ public final class EventManager implements IEventManager {
 		registerEventNames(new RobotDeathEvent(null));
 		registerEventNames(new RoundEndedEvent(0, 0, 0));
 		registerEventNames(dummyScannedRobotEvent);
-		registerEventNames(new ScannedPickupEvent(0, 0, 0, 0, 0));
-		registerEventNames(new PickupEvent(0, 0, null, 0));
+		registerEventNames(new ScannedPowerupEvent(0, 0, 0, 0, 0));
+		registerEventNames(new PowerupEvent(0, 0, null, 0));
 		registerEventNames(new SkippedTurnEvent(0));
 		registerEventNames(new StatusEvent(null));
 		registerEventNames(new WinEvent());

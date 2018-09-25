@@ -35,7 +35,7 @@ public class ImageManager implements IImageManager {
 	private Image gunImage;
 	private Image radarImage;
 	
-	private Image pickupImage;
+	private Image powerupImage;
 
 	private static final int MAX_NUM_COLORS = 256;
 
@@ -237,10 +237,10 @@ public class ImageManager implements IImageManager {
 	}
 
 	@Override
-	public Image getPickupImage() {
-		if (pickupImage == null) {
-			pickupImage = getImage("/net/sf/robocode/ui/images/pickup/"+ "power" + ".png");
+	public Image getPowerupImage() {
+		if (powerupImage == null) {
+			powerupImage = getImage("/net/sf/robocode/ui/images/powerup/powerup.png");
 		}
-		return pickupImage;
+		return powerupImage;
 	}
 }

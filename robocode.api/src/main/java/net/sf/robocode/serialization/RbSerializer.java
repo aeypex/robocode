@@ -59,8 +59,8 @@ public final class RbSerializer {
 	public final static byte RobotDeathEvent_TYPE = 39;
 	public final static byte SkippedTurnEvent_TYPE = 40;
 	public final static byte ScannedRobotEvent_TYPE = 41;
-	public final static byte ScannedPickupEvent_TYPE = 57; //want to use continuous, but dont know.
-	public final static byte PickupEvent_TYPE = 58; //want to use continuous, but dont know.
+	public final static byte ScannedPowerupEvent_TYPE = 57; //want to use continuous, but dont know.
+	public final static byte PowerupEvent_TYPE = 58; //want to use continuous, but dont know.
 	public final static byte HitByBulletEvent_TYPE = 42;
 	public final static byte HitRobotEvent_TYPE = 43;
 	public final static byte KeyPressedEvent_TYPE = 44;

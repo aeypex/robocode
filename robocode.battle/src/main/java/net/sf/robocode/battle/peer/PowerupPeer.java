@@ -10,8 +10,8 @@ package net.sf.robocode.battle.peer;
 
 import net.sf.robocode.battle.BoundingRectangle;
 import robocode.*;
-import robocode.control.PickupSetup;
-import robocode.control.snapshot.PickupState;
+import robocode.control.PowerupSetup;
+import robocode.control.snapshot.PowerupState;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -21,9 +21,9 @@ import java.util.List;
  * @author see Bullet (original)
  * @author Andreas Stock (contributor)
  */
-public class PickupPeer {
+public class PowerupPeer {
 	
-	public static final int defaultPickupColor = 0xFFABCDEF;
+	public static final int defaultPowerupColor = 0xFFABCDEF;
 	
 	public static final int
 	WIDTH = 36,
@@ -36,11 +36,11 @@ public class PickupPeer {
 	public static final int LOLN = 2; //so that randomized positions land more often to the middle. see "law of large numbers"
 
 	private final BattleRules battleRules;
-	private final int pickupId;
+	private final int powerupId;
 
 	protected RobotPeer victim;
 
-	protected PickupState state;
+	protected PowerupState state;
 
 	protected double x;
 	protected double y;
@@ -48,39 +48,39 @@ public class PickupPeer {
 	/**
 	 * The amount of Energy gained by picking up the Item.
 	 */
-	private double pickupEnergyBonus = Rules.PICKUP_ENERGY_BONUS;
+	private double powerupEnergyBonus = Rules.POWERUP_ENERGY_BONUS;
 	
 	/**
 	 * The amount of Turns after picking up the Item, before its available again.
 	 */
-	private long pickupRespawnTime = Rules.PICKUP_RESPAWN_TIME;
+	private long powerupRespawnTime = Rules.POWERUP_RESPAWN_TIME;
 	
 	private final BoundingRectangle boundingBox;
 
 	protected int turnCounter; // Do not set to -1
 
-	private final int color = defaultPickupColor;
+	private final int color = defaultPowerupColor;
 
-	public PickupPeer(PickupSetup ps, BattleRules battleRules, int pickupId) {
-		this(battleRules,pickupId);
+	public PowerupPeer(PowerupSetup ps, BattleRules battleRules, int powerupId) {
+		this(battleRules,powerupId);
 		if (ps.getX()!=null && ps.getX() != null) {
 			this.x = ps.getX();
 			this.y = ps.getY();
 		} else {
 			calculateRandomPosition();
 		}
-		this.pickupEnergyBonus = ps.getEnergyBonus();
-		this.pickupRespawnTime = ps.getRespawnTime();
+		this.powerupEnergyBonus = ps.getEnergyBonus();
+		this.powerupRespawnTime = ps.getRespawnTime();
 		
 		updateBoundingBox();
 	}
 	
-	public PickupPeer(BattleRules battleRules, int pickupId) {
+	public PowerupPeer(BattleRules battleRules, int powerupId) {
 		super();
 		this.battleRules = battleRules;
-		this.pickupId = pickupId;
+		this.powerupId = powerupId;
 		this.boundingBox = new BoundingRectangle();
-		state = PickupState.SPAWNED;
+		state = PowerupState.SPAWNED;
 		calculateRandomPosition();
 		updateBoundingBox();
 	}
@@ -105,29 +105,29 @@ public class PickupPeer {
 			if (!(otherRobot == null || otherRobot.isDead())
 					&& otherRobot.getBoundingBox().intersects(boundingBox)) {
 
-				state = PickupState.HIT_VICTIM;
+				state = PowerupState.HIT_VICTIM;
 				turnCounter = 0;
 				victim = otherRobot;
 
-				double energyGain = this.pickupEnergyBonus;
+				double energyGain = this.powerupEnergyBonus;
 				
 				otherRobot.updateEnergy(energyGain);
 				
 				victim.println(
-						"SYSTEM: Pickup Bonus for Robot"
+						"SYSTEM: Powerup Bonus for Robot"
 								+ (victim.getNameForEvent(otherRobot) + ": " + (int) (energyGain + .5)));
 
 				for (RobotPeer r : robots) {
-					r.addEvent(new PickupEvent(this.getPickupEnergyBonus(), this.getPickupRespawnTime(),
-							otherRobot.getName(), this.getPickupId()));
+					r.addEvent(new PowerupEvent(this.getPowerupEnergyBonus(), this.getPowerupRespawnTime(),
+							otherRobot.getName(), this.getPowerupId()));
 				}
 				break;
 			}
 		}
 	}
 
-	public int getPickupId() {
-		return pickupId;
+	public int getPowerupId() {
+		return powerupId;
 	}
 
 	public int getFrame() {
@@ -154,19 +154,19 @@ public class PickupPeer {
 		return y;
 	}
 
-	public double getPickupEnergyBonus() {
-		return pickupEnergyBonus;
+	public double getPowerupEnergyBonus() {
+		return powerupEnergyBonus;
 	}
 
-	public long getPickupRespawnTime() {
-		return pickupRespawnTime;
+	public long getPowerupRespawnTime() {
+		return powerupRespawnTime;
 	}
 
 	public boolean isActive() {
 		return state.isActive();
 	}
 
-	public PickupState getState() {
+	public PowerupState getState() {
 		return state;
 	}
 
@@ -188,7 +188,7 @@ public class PickupPeer {
 		updateBoundingBox();
 	}
 
-	public void setState(PickupState newState) {
+	public void setState(PowerupState newState) {
 		state = newState;
 	}
 
@@ -199,32 +199,32 @@ public class PickupPeer {
 		if (isActive()) {
 			checkRobotCollision(robots);
 		}
-		updatePickupState(respawnBlocked);
+		updatePowerupState(respawnBlocked);
 	}
 
-	protected void updatePickupState(boolean respawnBlocked) {
+	protected void updatePowerupState(boolean respawnBlocked) {
 		switch (state) {
 		case SPAWNED:
-			// Note that the Pickup must be in the SPAWNED state before it goes to the AVAILABLE state
+			// Note that the Powerup must be in the SPAWNED state before it goes to the AVAILABLE state
 			if (turnCounter >= 0) {
-				state = PickupState.AVAILABLE;
+				state = PowerupState.AVAILABLE;
 			}
 			break;
 
 		case HIT_VICTIM:
 			// if some bot collided with powerup, it transitions to HIT_VICTIM and then starts its respawn cycle.
 			turnCounter = 0;
-			if(this.pickupRespawnTime > 0) {
-				state = PickupState.UNAVAILABLE;
+			if(this.powerupRespawnTime > 0) {
+				state = PowerupState.UNAVAILABLE;
 				break;
 			}
-			state = PickupState.INACTIVE;
+			state = PowerupState.INACTIVE;
 			break;
 			
 		case UNAVAILABLE:
 			if (!respawnBlocked) {
-				if (turnCounter >= this.pickupRespawnTime) {
-					state = PickupState.SPAWNED;
+				if (turnCounter >= this.powerupRespawnTime) {
+					state = PowerupState.SPAWNED;
 					turnCounter = 0;
 				} 
 			}
@@ -237,7 +237,7 @@ public class PickupPeer {
 
 	@Override
 	public String toString() {
-		return getVictim().getName() + " V" + (int) this.pickupEnergyBonus + " X" + (int) x + " Y" + (int) y + " " + state.toString();
+		return getVictim().getName() + " V" + (int) this.powerupEnergyBonus + " X" + (int) x + " Y" + (int) y + " " + state.toString();
 	}
 
 	public void initializeRound() {
@@ -245,14 +245,14 @@ public class PickupPeer {
 		/*if (isRandomlyPositioned) {
 			battleRules.calculateRandomPosition(WIDTH, HEIGHT, LOLN);
 		}*/
-		setState(PickupState.SPAWNED);
+		setState(PowerupState.SPAWNED);
 		turnCounter = 0;
 
-		//status = new AtomicReference<PickupStatus>(); ??
+		//status = new AtomicReference<PowerupStatus>(); ??
 	}
 
 	public void cleanupAfterRoundEnded() {
-		setState(PickupState.INACTIVE);
+		setState(PowerupState.INACTIVE);
 		turnCounter = 0;
 		return;
 	}

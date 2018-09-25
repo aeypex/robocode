@@ -353,7 +353,7 @@ public class NewBattleRulesTab extends JPanel {
 	private JTextField getNumberOfPickupsTextField() {
 		if (numberOfPickupsTextField == null) {
 			numberOfPickupsTextField = new JTextField(5);
-			numberOfPickupsTextField.setText("" + battleProperties.getNumPickups());
+			numberOfPickupsTextField.setText("" + battleProperties.getNumPowerups());
 			numberOfPickupsTextField.setInputVerifier(
 					new InputVerifier() {
 				@Override
@@ -368,7 +368,7 @@ public class NewBattleRulesTab extends JPanel {
 					if (!isValid) {
 						WindowUtil.messageError(
 								"'Number of Pickups' must be an integer value >= 0.\n" + "Default value is 0.");
-						numberOfPickupsTextField.setText("" + battleProperties.getNumPickups());
+						numberOfPickupsTextField.setText("" + battleProperties.getNumPowerups());
 					}
 					return isValid;
 				}
@@ -462,7 +462,7 @@ public class NewBattleRulesTab extends JPanel {
 			}
 			if (numberOfPickups != null) {
 				//TODO settingsManager.getBattleDefaultNumberOfPickups():
-				battleProperties.setNumPickups(numberOfPickups);
+				battleProperties.setNumPowerups(numberOfPickups);
 			}
 			boolean hideEnemyNames = hideEnemyNamesCheckBox.isSelected();
 			settingsManager.setBattleDefaultHideEnemyNames(hideEnemyNames);
@@ -497,7 +497,7 @@ public class NewBattleRulesTab extends JPanel {
 				battleProperties.setInactivityTime(450);
 				battleProperties.setHideEnemyNames(false);
 				battleProperties.setSentryBorderSize(100);
-				battleProperties.setNumPickups(0);
+				battleProperties.setNumPowerups(0);
 
 				pushBattlePropertiesToUIComponents();
 			}
@@ -519,7 +519,7 @@ public class NewBattleRulesTab extends JPanel {
 			getGunCoolingRateTextField().setText("" + battleProperties.getGunCoolingRate());
 			getInactivityTimeTextField().setText("" + battleProperties.getInactivityTime());
 			getSentryBorderSizeTextField().setText("" + battleProperties.getSentryBorderSize());
-			getNumberOfPickupsTextField().setText("" + battleProperties.getNumPickups());
+			getNumberOfPickupsTextField().setText("" + battleProperties.getNumPowerups());
 			hideEnemyNamesCheckBox.setSelected(battleProperties.getHideEnemyNames());
 		}
 	}

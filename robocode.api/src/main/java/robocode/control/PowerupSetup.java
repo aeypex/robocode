@@ -10,36 +10,36 @@ package robocode.control;
 import robocode.Rules;
 
 /**
- * Contains the initial position for a Pickup.
+ * Contains the initial position for a powerup.
  *
  * @author see RobotSetup (original)
  * @author Andreas Stock
  * 
  * @since 1.9.3.2
  */
-public class PickupSetup implements java.io.Serializable {
+public class PowerupSetup implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Double x;
 	private Double y;
 
-	private double energyBonus = Rules.PICKUP_ENERGY_BONUS;
+	private double energyBonus = Rules.POWERUP_ENERGY_BONUS;
 
-	private long respawnTime = Rules.PICKUP_RESPAWN_TIME;
+	private long respawnTime = Rules.POWERUP_RESPAWN_TIME;
 
 	/**
-	 * Constructs a new PickupSetup.
+	 * Constructs a new powerupSetup.
 	 *
 	 * @param x is the x coordinate, where {@code null} means random.
 	 * @param y is the y coordinate, where {@code null} means random.
 	 */
-	public PickupSetup(Double x, Double y) {
+	public PowerupSetup(Double x, Double y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	public PickupSetup(double x2, double y2, double energygain, long respawntime) {
+	public PowerupSetup(double x2, double y2, double energygain, long respawntime) {
 		this(x2,y2);
 		this.energyBonus = energygain;
 		this.respawnTime = respawntime;

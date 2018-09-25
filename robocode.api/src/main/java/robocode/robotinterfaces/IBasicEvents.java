@@ -277,23 +277,23 @@ public interface IBasicEvents {
 	void onWin(WinEvent event);
 
 	/**
-	 * This method is called when your robot sees a pickup, i.e. when the
-	 * robot's radar scan "hits" the pickup.
+	 * This method is called when your robot sees a powerup, i.e. when the
+	 * robot's radar scan "hits" the powerup.
 	 * You should override it in your robot if you want to be informed of this
 	 * event. (Almost all robots should override this!)
 	 * <p>
-	 * This event is automatically called if there is a pickup in range of your
+	 * This event is automatically called if there is a powerup in range of your
 	 * radar.
 	 * <p>
 	 * Note that the robot's radar can only see robot within the range defined
 	 * by {@link Rules#RADAR_SCAN_RADIUS} (1200 pixels).
 	 * <p>
-	 * Also note that the bearing of the scanned pickup is relative to your
+	 * Also note that the bearing of the scanned powerup is relative to your
 	 * robot's heading.
 	 * <p>
 	 * Example:
 	 * <pre>
-	 *   void onScannedPickup(ScannedPickupEvent event) {
+	 *   void onScannedPowerup(ScannedPowerupEvent event) {
 	 *       // Assuming radar and body are aligned...
 	 *       if (event.getDistance() < 100) {
 	 *           ahead(100);
@@ -307,38 +307,38 @@ public interface IBasicEvents {
 	 * <li>which is often not the case,
 	 * <li>and the event is current,
 	 * <li>and you call ahead() before taking any other actions, {@link
-	 * Robot#ahead(double) ahead()} will move directly at the pickup.
+	 * Robot#ahead(double) ahead()} will move directly at the powerup.
 	 * </ul>
 	 * <p>
-	 * In essence, this means that if you can see a pickup, and nobody else picks it up,
+	 * In essence, this means that if you can see a powerup, and nobody else picks it up,
 	 * then you are going to collect it.
 	 * <p>
 	 *
-	 * @param event the scanned-pickup event set by the game
-	 * @see ScannedPickupEvent
+	 * @param event the scanned-powerup event set by the game
+	 * @see ScannedPowerupEvent
 	 * @see Event
 	 * @see Rules#RADAR_SCAN_RADIUS
 	 */
-	void onScannedPickup(ScannedPickupEvent scannedPickupEvent);
+	void onScannedPowerup(ScannedPowerupEvent scannedPowerupEvent);
 
 	
 	/**
-	 * This method is called when your robot collects a pickup.
+	 * This method is called when your robot collects a powerup.
 	 * You should override it in your robot if you want to be informed of this
 	 * event.
 	 * <p>
 	 * Example:
 	 * <pre>
-	 *   void onPickup(PickupEvent event) {
+	 *   void onPowerup(PowerupEvent event) {
 	 *       //save when you want to be here again.
 	 *       turn = event.getRespawnTime() + event.getTime();
 	 *       x = this.getX();
 	 *       y = this.getY();
 	 *   }
 	 * </pre>
-	 * @param event the pickup event set by the game
-	 * @see PickupEvent
+	 * @param event the powerup event set by the game
+	 * @see PowerupEvent
 	 * @see Event
 	 */
-	void onPickup(PickupEvent pickupEvent);
+	void onPowerup(PowerupEvent powerupEvent);
 }

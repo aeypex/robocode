@@ -31,5 +31,5 @@ public interface IImageManager {
 
 	RenderImage getColoredRadarRenderImage(Integer color);
 
-	Image getPickupImage();
+	Image getPowerupImage();
 }

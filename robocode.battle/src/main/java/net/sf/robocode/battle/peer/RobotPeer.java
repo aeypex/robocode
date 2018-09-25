@@ -651,7 +651,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
-	public void initializeRound(List<RobotPeer> robots, List<PickupPeer> pickups, RobotSetup[] initialRobotSetups) {
+	public void initializeRound(List<RobotPeer> robots, List<PowerupPeer> pickups, RobotSetup[] initialRobotSetups) {
 		boolean valid = false;
 
 		if (initialRobotSetups != null) {
@@ -773,7 +773,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		commands = new AtomicReference<ExecCommands>(newExecCommands);
 	}
 
-	private boolean validSpot(List<RobotPeer> robots, List<PickupPeer> pickups) {
+	private boolean validSpot(List<RobotPeer> robots, List<PowerupPeer> pickups) {
 		for (RobotPeer otherRobot : robots) {
 			if (otherRobot != null && otherRobot != this) {
 				if (getBoundingBox().intersects(otherRobot.getBoundingBox())) {
@@ -781,7 +781,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 				}
 			}
 		}
-		for (PickupPeer pickupPeer : pickups) {
+		for (PowerupPeer pickupPeer : pickups) {
 			if (pickupPeer.isActive()
 					&& pickupPeer.getBoundingBox().intersects(getBoundingBox())) {
 				return false;
@@ -942,7 +942,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
-	public void performScan(List<RobotPeer> robots, List<PickupPeer> pickups) {
+	public void performScan(List<RobotPeer> robots, List<PowerupPeer> pickups) {
 		if (isDead()) {
 			return;
 		}
@@ -1519,7 +1519,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
-	private void scan(double lastRadarHeading, List<RobotPeer> robots, List<PickupPeer> pickups) {
+	private void scan(double lastRadarHeading, List<RobotPeer> robots, List<PowerupPeer> pickups) {
 		if (statics.isDroid()) {
 			return;
 		}
@@ -1559,7 +1559,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 				addEvent(event);
 			}
 		}
-		for (PickupPeer p : pickups) {
+		for (PowerupPeer p : pickups) {
 			if(p != null && p.isActive()
 					&& intersects(scanArc, p.getBoundingBox())) {
 				double dx = p.getX() - x;
@@ -1567,8 +1567,8 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 				double angle = atan2(dx, dy);
 				double dist = Math.hypot(dx, dy);
 				
-				final ScannedPickupEvent event = new ScannedPickupEvent(p.getPickupEnergyBonus(),
-						normalRelativeAngle(angle - getBodyHeading()), dist, p.getPickupRespawnTime(), p.getPickupId());
+				final ScannedPowerupEvent event = new ScannedPowerupEvent(p.getPowerupEnergyBonus(),
+						normalRelativeAngle(angle - getBodyHeading()), dist, p.getPowerupRespawnTime(), p.getPowerupId());
 				
 				addEvent(event);
 			}

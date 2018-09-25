@@ -10,7 +10,7 @@ package net.sf.robocode.battle.snapshot;
 
 import net.sf.robocode.battle.Battle;
 import net.sf.robocode.battle.peer.BulletPeer;
-import net.sf.robocode.battle.peer.PickupPeer;
+import net.sf.robocode.battle.peer.PowerupPeer;
 import net.sf.robocode.battle.peer.RobotPeer;
 import net.sf.robocode.serialization.IXmlSerializable;
 import net.sf.robocode.serialization.XmlReader;
@@ -39,7 +39,7 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	private List<IRobotSnapshot> robots;
 	
 	/** List of snapshots for the pickups in the battle */
-	private List<IPickupSnapshot> pickups;
+	private List<IPowerupSnapshot> pickups;
 
 	/** List of snapshots for the bullets that are currently on the battlefield */
 	private List<IBulletSnapshot> bullets;
@@ -69,17 +69,17 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	 * @param readoutText {@code true} if the output text from the robots must be included in the snapshot;
 	 *                    {@code false} otherwise.
 	 */
-	public TurnSnapshot(Battle battle, List<RobotPeer> battleRobots, List<PickupPeer> battlePickups, List<BulletPeer> battleBullets, boolean readoutText) {
+	public TurnSnapshot(Battle battle, List<RobotPeer> battleRobots, List<PowerupPeer> battlePickups, List<BulletPeer> battleBullets, boolean readoutText) {
 		robots = new ArrayList<IRobotSnapshot>();
-		pickups = new ArrayList<IPickupSnapshot>();
+		pickups = new ArrayList<IPowerupSnapshot>();
 		bullets = new ArrayList<IBulletSnapshot>();
 
 		for (RobotPeer robotPeer : battleRobots) {
 			robots.add(new RobotSnapshot(robotPeer, readoutText));
 		}
 		
-		for (PickupPeer pickupPeer : battlePickups) {
-			pickups.add(new PickupSnapshot(pickupPeer));
+		for (PowerupPeer pickupPeer : battlePickups) {
+			pickups.add(new PowerupSnapshot(pickupPeer));
 		}
 
 		for (BulletPeer bulletPeer : battleBullets) {
@@ -107,8 +107,8 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	/**
 	 * {@inheritDoc}
 	 */
-	public IPickupSnapshot[] getPickups() {
-		return pickups.toArray(new IPickupSnapshot[pickups.size()]);
+	public IPowerupSnapshot[] getPickups() {
+		return pickups.toArray(new IPowerupSnapshot[pickups.size()]);
 	}
 
 	/**
@@ -231,8 +231,8 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 			writer.endElement();
 			
 			writer.startElement(options.shortAttributes ? "pu" : "pickups");{
-				for (IPickupSnapshot p : pickups) {
-					final PickupSnapshot ps = (PickupSnapshot) p;
+				for (IPowerupSnapshot p : pickups) {
+					final PowerupSnapshot ps = (PowerupSnapshot) p;
 					ps.writeXml(writer, options);
 				}
 			}
@@ -306,13 +306,13 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 				
 				reader.expect("pickups", "pu", new XmlReader.ListElement() {
 					public IXmlSerializable read(XmlReader reader) {
-						snapshot.pickups = new ArrayList<IPickupSnapshot>();
+						snapshot.pickups = new ArrayList<IPowerupSnapshot>();
 						// prototype
-						return new PickupSnapshot();
+						return new PowerupSnapshot();
 					}
 
 					public void add(IXmlSerializable child) {
-						snapshot.pickups.add((PickupSnapshot) child);
+						snapshot.pickups.add((PowerupSnapshot) child);
 					}
 
 					public void close() {}

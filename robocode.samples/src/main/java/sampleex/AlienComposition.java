@@ -91,9 +91,9 @@ public class AlienComposition implements IBasicRobot {
 
 		public void onWin(WinEvent e) {}
 
-		public void onScannedPickup(ScannedPickupEvent scannedPickupEvent) {}
+		public void onScannedPowerup(ScannedPowerupEvent scannedPickupEvent) {}
 
-		public void onPickup(PickupEvent pickupEvent) {}
+		public void onPowerup(PowerupEvent pickupEvent) {}
 	}
 }
 

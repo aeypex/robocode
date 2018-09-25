@@ -147,18 +147,18 @@ public final class Rules {
 	/**
 	 * The amount of Energy gained by picking up the Item.
 	 */
-	public static final double PICKUP_ENERGY_BONUS = getBulletDamage(MAX_BULLET_POWER);
+	public static final double POWERUP_ENERGY_BONUS = getBulletDamage(MAX_BULLET_POWER);
 	
 	/**
 	 * The amount of Turns after picking up the Item, before its available again.
 	 */
-	public static final int PICKUP_RESPAWN_TIME = 200;
+	public static final int POWERUP_RESPAWN_TIME = 200;
 
 	
 	/**
 	 * If Round goes for more than set amount of turns, pickups wont respawn anymore. Rounds should not last forever.
 	 */
-	public static final int PICKUP_BLOCK_RESPAWN_AT_MAX_TURNS = 2000;
+	public static final int POWERUP_BLOCK_RESPAWN_AT_MAX_TURNS = 2000;
 
 	/**
 	 * Returns the turn rate of a robot given a specific velocity measured in

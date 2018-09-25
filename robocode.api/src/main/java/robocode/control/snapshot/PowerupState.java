@@ -9,33 +9,33 @@ package robocode.control.snapshot;
 
 
 /**
- * Defines a pickup state, which can be: just spawned, available, hitting a victim, unavailable or inactive.
+ * Defines a powerup state, which can be: just spawned, available, hitting a victim, unavailable or inactive.
  *
  * @author Andreas Stock
  */
-public enum PickupState {
+public enum PowerupState {
 
-	/** The Pickup has just been spawned this turn and hence just been created. This state only last one turn. */
+	/** The Powerup has just been spawned this turn and hence just been created. This state only last one turn. */
 	SPAWNED(0),
 
-	/** The pickup is now available on the battlefield, but has not hit anything yet. */
+	/** The powerup is now available on the battlefield, but has not hit anything yet. */
 	AVAILABLE(1),
 
-	/** The Pickup was hit by a robot victim. */
+	/** The Powerup was hit by a robot victim. */
 	HIT_VICTIM(2),
 
-	/** The Pickup was picked up and is currently waiting to be respawned.  */
+	/** The Powerup was picked up and is currently waiting to be respawned.  */
 	UNAVAILABLE(3),
 
-	/** The Pickup is currently inactive. Hence, it is not active or visible on the battlefield. */
+	/** The Powerup is currently inactive. Hence, it is not active or visible on the battlefield. */
 	INACTIVE(4),
 	
-	/** The Pickup is ok to be removed and cleaned up. */
+	/** The Powerup is ok to be removed and cleaned up. */
 	REMOVE(5);
 
 	private final int value;
 
-	private PickupState(int value) {
+	private PowerupState(int value) {
 		this.value = value;
 	}
 
@@ -51,17 +51,17 @@ public enum PickupState {
 	}
 
 	/**
-	 * Returns a pickupState based on an integer value that represents a pickupState.
+	 * Returns a powerupState based on an integer value that represents a powerupState.
 	 *
-	 * @param value the integer value that represents a specific pickupState.
-	 * @return a pickupState that corresponds to the specific integer value.
+	 * @param value the integer value that represents a specific powerupState.
+	 * @return a powerupState that corresponds to the specific integer value.
 	 *
 	 * @see #getValue()
 	 *
 	 * @throws IllegalArgumentException if the specified value does not correspond
-	 *                                  to a pickupState and hence is invalid.
+	 *                                  to a powerupState and hence is invalid.
 	 */
-	public static PickupState toState(int value) {
+	public static PowerupState toState(int value) {
 		switch (value) {
 		case 0:
 			return SPAWNED;

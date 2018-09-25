@@ -30,7 +30,7 @@ public interface ITurnSnapshot {
 	 *
 	 * @return a list of snapshots for the pickups participating in the battle. 
 	 */
-	IPickupSnapshot[] getPickups();
+	IPowerupSnapshot[] getPickups();
 
 	/**
 	 * Returns a list of snapshots for the bullets that are currently on the battlefield.

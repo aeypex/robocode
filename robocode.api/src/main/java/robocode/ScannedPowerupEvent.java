@@ -19,8 +19,8 @@ import java.nio.ByteBuffer;
 
 
 /**
- * A ScannedRobotEvent is sent to {@link Robot#onScannedPickup(PickupEvent)
- * onScannedRobot()} when you scan a pickup.
+ * A ScannedRobotEvent is sent to {@link Robot#onScannedPowerup(ScannedPowerupEvent)
+ * onScannedRobot()} when you scan a powerup.
  * You can use the information contained in this event to determine what to do.
  * <p>
  * <b>Note</b>: You should not inherit from this class in your own event class!
@@ -31,38 +31,32 @@ import java.nio.ByteBuffer;
  * @author Flemming N. Larsen (contributor)
  * @author Andreas Stock (contributor)
  */
-public class PickupEvent extends Event {
+public class ScannedPowerupEvent extends Event {
 	private static final long serialVersionUID = 1L;
-	private final static int DEFAULT_PRIORITY = 10;
+	private final static int DEFAULT_PRIORITY = 11;
 
-	private final double energyBonus;
-	private final long respawnTime;
-	private final String name;
 	private final int id;
-	
-
-	
-	/**
-	 * @param energybonus
-	 * @param respawnTime
-	 * @param robotname
-	 * @param id
-	 */
-	public PickupEvent(double energybonus, long respawnTime, String robotname, int id) {
-		super();
-		this.energyBonus = energybonus;
-		this.respawnTime = respawnTime;
-		this.name = robotname;
-		this.id = id;
-	}
+	private final double energyBonus;
+	private final double bearing;
+	private final double distance;
+	private final double respawnTime;
 
 	/**
-	 * Returns the name of the robot.
+	 * Called by the game to create a new ScannedPowerupEvent.
 	 *
-	 * @return the name of the robot
+	 * @param energyBonus   the energy of the scanned powerup
+	 * @param bearing  the bearing of the scanned powerup, in radians
+	 * @param distance the distance from your robot to the scanned powerup
+	 * @param id TODO
+	 * 
 	 */
-	public String getName() {
-		return name;
+	public ScannedPowerupEvent(double energyBonus, double bearing, double distance, double respawnTime, int id) {
+		super();
+		this.id = id;
+		this.energyBonus = energyBonus;
+		this.bearing = bearing;
+		this.distance = distance;
+		this.respawnTime = respawnTime;
 	}
 
 	public int getId() {
@@ -70,18 +64,47 @@ public class PickupEvent extends Event {
 	}
 
 	/**
-	 * Returns the energybonus of the pickup.
+	 * Returns the bearing to the powerup you scanned, relative to your robot's
+	 * heading, in degrees (-180 <= getBearing() < 180)
 	 *
-	 * @return the energybonus of the pickup
+	 * @return the bearing to the powerup you scanned, in degrees
+	 */
+	public double getBearing() {
+		return bearing * 180.0 / Math.PI;
+	}
+
+	/**
+	 * Returns the bearing to the powerup you scanned, relative to your robot's
+	 * heading, in radians (-PI <= getBearingRadians() < PI)
+	 *
+	 * @return the bearing to the powerup you scanned, in radians
+	 */
+	public double getBearingRadians() {
+		return bearing;
+	}
+
+	/**
+	 * Returns the distance to the powerup (your center to his center).
+	 *
+	 * @return the distance to the powerup.
+	 */
+	public double getDistance() {
+		return distance;
+	}
+
+	/**
+	 * Returns the energybonus of the powerup.
+	 *
+	 * @return the energybonus of the powerup
 	 */
 	public double getEnergyBonus() {
 		return energyBonus;
 	}
-
+	
 	/**
-	 * @return Turns until this pickup will be available again.
+	 * @return turns until this powerup will be available again.
 	 */
-	public long getRespawnTime() {
+	public double getRespawnTime() {
 		return respawnTime;
 	}
 
@@ -96,8 +119,8 @@ public class PickupEvent extends Event {
 		}
 		// Compare the distance, if the events are ScannedRobotEvents
 		// The shorter distance to the robot, the higher priority
-		if (event instanceof PickupEvent) {
-			return (int) (this.getRespawnTime() - ((PickupEvent) event).getRespawnTime());
+		if (event instanceof ScannedPowerupEvent) {
+			return (int) (this.getDistance() - ((ScannedPowerupEvent) event).getDistance());
 		}
 		// No difference found
 		return 0;
@@ -118,7 +141,7 @@ public class PickupEvent extends Event {
 	final void dispatch(IBasicRobot robot, IRobotStatics statics, Graphics2D graphics) {
 		IBasicEvents listener = robot.getBasicEventListener();
 		if (listener != null) {
-			listener.onPickup(this);
+			listener.onScannedPowerup(this);
 		}
 	}
 
@@ -127,7 +150,7 @@ public class PickupEvent extends Event {
 	 */
 	@Override
 	byte getSerializationType() {
-		return RbSerializer.PickupEvent_TYPE;
+		return RbSerializer.ScannedPowerupEvent_TYPE;
 	}
 
 	static ISerializableHelper createHiddenSerializer() {
@@ -136,25 +159,24 @@ public class PickupEvent extends Event {
 
 	private static class SerializableHelper implements ISerializableHelper {
 		public int sizeOf(RbSerializer serializer, Object object) {
-			PickupEvent obj = (PickupEvent) object;
-			return RbSerializer.SIZEOF_TYPEINFO + serializer.sizeOf(obj.name) + RbSerializer.SIZEOF_DOUBLE + RbSerializer.SIZEOF_LONG + RbSerializer.SIZEOF_INT;
+			return RbSerializer.SIZEOF_TYPEINFO + 4 * RbSerializer.SIZEOF_DOUBLE;
 		}
 
 		public void serialize(RbSerializer serializer, ByteBuffer buffer, Object object) {
-			PickupEvent obj = (PickupEvent) object;
-			serializer.serialize(buffer, obj.name);
-			serializer.serialize(buffer, obj.id);
+			ScannedPowerupEvent obj = (ScannedPowerupEvent) object;
 			serializer.serialize(buffer, obj.energyBonus);
+			serializer.serialize(buffer, obj.bearing);
+			serializer.serialize(buffer, obj.distance);
 			serializer.serialize(buffer, obj.respawnTime);
 		}
 
 		public Object deserialize(RbSerializer serializer, ByteBuffer buffer) {
-			String name = serializer.deserializeString(buffer);
-			int id = buffer.getInt();
 			double energybonus = buffer.getDouble();
-			long respawnTime = buffer.getLong();
+			double bearing = buffer.getDouble();
+			double distance = buffer.getDouble();
+			double respawnTime = buffer.getDouble();
 
-			return new PickupEvent(energybonus, respawnTime, name, id);
+			return new ScannedPowerupEvent(energybonus, bearing, distance, respawnTime, -1);
 		}
 	}
 }

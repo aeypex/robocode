@@ -56,7 +56,7 @@ interface IRobotPeerBattle extends ContestantPeer {
 
 	void setWinner(boolean newWinner);
 
-	void initializeRound(List<RobotPeer> robots, List<PickupPeer> pickups, RobotSetup[] initialRobotPositions);
+	void initializeRound(List<RobotPeer> robots, List<PowerupPeer> pickups, RobotSetup[] initialRobotPositions);
 
 	void startRound(long millisWait, int nanosWait);
 
@@ -66,5 +66,5 @@ interface IRobotPeerBattle extends ContestantPeer {
 
 	void performMove(List<RobotPeer> robots, double zapEnergy);
 
-	void performScan(List<RobotPeer> robots, List<PickupPeer> pickups);
+	void performScan(List<RobotPeer> robots, List<PowerupPeer> pickups);
 }

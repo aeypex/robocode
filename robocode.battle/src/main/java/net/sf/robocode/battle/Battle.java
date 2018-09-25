@@ -11,7 +11,7 @@ package net.sf.robocode.battle;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.battle.peer.BulletPeer;
 import net.sf.robocode.battle.peer.ContestantPeer;
-import net.sf.robocode.battle.peer.PickupPeer;
+import net.sf.robocode.battle.peer.PowerupPeer;
 import net.sf.robocode.battle.peer.RobotPeer;
 import net.sf.robocode.battle.peer.TeamPeer;
 import net.sf.robocode.battle.snapshot.TurnSnapshot;
@@ -23,7 +23,7 @@ import net.sf.robocode.repository.IRobotItem;
 import net.sf.robocode.security.HiddenAccess;
 import net.sf.robocode.settings.ISettingsManager;
 import robocode.*;
-import robocode.control.PickupSetup;
+import robocode.control.PowerupSetup;
 import robocode.control.RandomFactory;
 import robocode.control.RobotResults;
 import robocode.control.RobotSetup;
@@ -32,7 +32,7 @@ import robocode.control.events.*;
 import robocode.control.events.RoundEndedEvent;
 import robocode.control.snapshot.BulletState;
 import robocode.control.snapshot.ITurnSnapshot;
-import robocode.control.snapshot.PickupState;
+import robocode.control.snapshot.PowerupState;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -71,11 +71,11 @@ public final class Battle extends BaseBattle {
 
 	// Objects in the battle
 	private int robotsCount;
-	private int pickupsCount;
+	private int powerupsCount;
 	private List<RobotPeer> robots = new ArrayList<RobotPeer>();
 	private List<ContestantPeer> contestants = new ArrayList<ContestantPeer>();
 	private final List<BulletPeer> bullets = new CopyOnWriteArrayList<BulletPeer>();
-	private List<PickupPeer> pickups = new ArrayList<PickupPeer>();
+	private List<PowerupPeer> powerups = new ArrayList<PowerupPeer>();
 
 	// Robot counters
 	private int activeParticipants;
@@ -87,7 +87,7 @@ public final class Battle extends BaseBattle {
 	// Initial robot setups (if any)
 	private RobotSetup[] initialRobotSetups;
 
-	private PickupSetup[] initialPickupSetups;
+	private PowerupSetup[] initialPowerupSetups;
 	
 
 	public Battle(ISettingsManager properties, IBattleManager battleManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher eventDispatcher) { // NO_UCD (unused code)
@@ -106,16 +106,16 @@ public final class Battle extends BaseBattle {
 		computeInitialPositions(battleProps.getInitialPositions());
 		createPeers(battlingRobotsList);
 		
-		pickupsCount = battleProps.getNumPickups();
-		initialPickupSetups = computeInitialPickupSetups(battleProps);
-		createPickupPeers();
+		powerupsCount = battleProps.getNumPowerups();
+		initialPowerupSetups = computeInitialPowerupSetups(battleProps);
+		createPowerupPeers();
 	}
 
-	private void createPickupPeers() {
-		if (initialPickupSetups != null) {
-			for (PickupSetup ps : initialPickupSetups) {
-				final PickupPeer pickupPeer = new PickupPeer(ps, battleRules, pickups.size());
-				pickups.add(pickupPeer);
+	private void createPowerupPeers() {
+		if (initialPowerupSetups != null) {
+			for (PowerupSetup ps : initialPowerupSetups) {
+				final PowerupPeer powerupPeer = new PowerupPeer(ps, battleRules, powerups.size());
+				powerups.add(powerupPeer);
 			}
 		}
 	}
@@ -251,8 +251,8 @@ public final class Battle extends BaseBattle {
 		return robotsCount;
 	}
 
-	public int getPickupsCount() {
-		return pickupsCount;
+	public int getPowerupsCount() {
+		return powerupsCount;
 	}
 
 	public boolean isDebugging() {
@@ -352,7 +352,7 @@ public final class Battle extends BaseBattle {
 		for (RobotPeer robotPeer : robots) {
 			robotPeer.cleanup();
 		}
-		pickups.clear();
+		powerups.clear();
 		hostManager.resetThreadManager();
 
 		super.finalizeBattle();
@@ -366,12 +366,12 @@ public final class Battle extends BaseBattle {
 
 		// At this point the unsafe loader thread will now set itself to wait for a notify
 
-		for (PickupPeer pickupPeer : pickups) {
-			pickupPeer.initializeRound();
+		for (PowerupPeer powerupPeer : powerups) {
+			powerupPeer.initializeRound();
 		}
 		
 		for (RobotPeer robotPeer : robots) {
-			robotPeer.initializeRound(robots, pickups, initialRobotSetups);
+			robotPeer.initializeRound(robots, powerups, initialRobotSetups);
 			robotPeer.println("=========================");
 			robotPeer.println("Round " + (getRoundNum() + 1) + " of " + getNumRounds());
 			robotPeer.println("=========================");
@@ -416,7 +416,7 @@ public final class Battle extends BaseBattle {
 
 		Logger.logMessage(""); // puts in a new-line in the log message
 
-		final ITurnSnapshot snapshot = new TurnSnapshot(this, robots, pickups, bullets, false); 
+		final ITurnSnapshot snapshot = new TurnSnapshot(this, robots, powerups, bullets, false); 
 
 		eventDispatcher.onRoundStarted(new RoundStartedEvent(snapshot, getRoundNum()));
 	}
@@ -428,8 +428,8 @@ public final class Battle extends BaseBattle {
 		for (RobotPeer robotPeer : robots) {
 			robotPeer.waitForStop();
 		}
-		for (PickupPeer pickupPeer : pickups) {
-			pickupPeer.cleanupAfterRoundEnded();
+		for (PowerupPeer powerupPeer : powerups) {
+			powerupPeer.cleanupAfterRoundEnded();
 		}
 		bullets.clear();
 
@@ -451,7 +451,7 @@ public final class Battle extends BaseBattle {
 
 		updateBullets();
 		
-		updatePickups();
+		updatePowerups();
 
 		updateRobots();
 
@@ -536,7 +536,7 @@ public final class Battle extends BaseBattle {
 
 	@Override
 	protected void finalizeTurn() {
-		eventDispatcher.onTurnEnded(new TurnEndedEvent(new TurnSnapshot(this, robots, pickups, bullets, true)));
+		eventDispatcher.onTurnEnded(new TurnEndedEvent(new TurnSnapshot(this, robots, powerups, bullets, true)));
 
 		super.finalizeTurn();
 	}
@@ -579,12 +579,12 @@ public final class Battle extends BaseBattle {
 	}
 
 	/**
-	 * Returns a list of all pickups in random order. This method is used to gain fair play in Robocode.
+	 * Returns a list of all powerups in random order. This method is used to gain fair play in Robocode.
 	 *
-	 * @return a list of pickup peers.
+	 * @return a list of powerup peers.
 	 */
-	private List<PickupPeer> getPickupsAtRandom() {
-		List<PickupPeer> shuffledList = new ArrayList<PickupPeer>(pickups);
+	private List<PowerupPeer> getPowerupsAtRandom() {
+		List<PowerupPeer> shuffledList = new ArrayList<PowerupPeer>(powerups);
 
 		Collections.shuffle(shuffledList, RandomFactory.getRandom());
 		return shuffledList;
@@ -630,15 +630,15 @@ public final class Battle extends BaseBattle {
 		}
 	}
 	
-	private void updatePickups() {
-		boolean respawnBlocked = (this.currentTime > Rules.PICKUP_BLOCK_RESPAWN_AT_MAX_TURNS);
+	private void updatePowerups() {
+		boolean respawnBlocked = (this.currentTime > Rules.POWERUP_BLOCK_RESPAWN_AT_MAX_TURNS);
 		
-		for (PickupPeer p : getPickupsAtRandom()) {
-			if (p.getState() != PickupState.INACTIVE) {
+		for (PowerupPeer p : getPowerupsAtRandom()) {
+			if (p.getState() != PowerupState.INACTIVE) {
 				p.update(getRobotsAtRandom(), respawnBlocked);
 			}
-			if (p.getState() == PickupState.REMOVE) {
-				pickups.remove(p);
+			if (p.getState() == PowerupState.REMOVE) {
+				powerups.remove(p);
 			}
 		}
 	}
@@ -655,7 +655,7 @@ public final class Battle extends BaseBattle {
 
 		// Scan after moved all
 		for (RobotPeer robotPeer : getRobotsAtRandom()) {
-			robotPeer.performScan(getRobotsAtRandom(), getPickupsAtRandom());
+			robotPeer.performScan(getRobotsAtRandom(), getPowerupsAtRandom());
 		}
 	}
 
@@ -848,18 +848,18 @@ public final class Battle extends BaseBattle {
 		}
 	}
 	
-	private PickupSetup[] computeInitialPickupSetups(BattleProperties battleProps) {
+	private PowerupSetup[] computeInitialPowerupSetups(BattleProperties battleProps) {
 		
-		PickupSetup[] thePickupSetups = null;
+		PowerupSetup[] thePowerupSetups = null;
 
-		String battlePropsPickupSpec = battleProps.getInitialPickupSpecification();
+		String battlePropsPowerupSpec = battleProps.getInitialPowerupSpecification();
 		
 
 		List<String> positions = new ArrayList<String>();
 
-		if (battlePropsPickupSpec  != null && battlePropsPickupSpec.trim().length() != 0) {
+		if (battlePropsPowerupSpec  != null && battlePropsPowerupSpec.trim().length() != 0) {
 			Pattern pattern = Pattern.compile("([^,(]*[(][^)]*[)])?[^,]*,?");
-			Matcher matcher = pattern.matcher(battlePropsPickupSpec);
+			Matcher matcher = pattern.matcher(battlePropsPowerupSpec);
 
 			while (matcher.find()) {
 				String pos = matcher.group();
@@ -869,23 +869,23 @@ public final class Battle extends BaseBattle {
 			}
 		}
 		
-		int max = Math.max(positions.size(),battleProps.getNumPickups());
+		int max = Math.max(positions.size(),battleProps.getNumPowerups());
 		if(max ==0)
 			return null;
-		thePickupSetups = new PickupSetup[max];
+		thePowerupSetups = new PowerupSetup[max];
 
 		String[] coords;
 		double x=0, y=0, energygain = 0;
 		long respawntime=0;
 		List<Point2D> points = battleRules.calculateEqualyDistributedPoints2D(max);
 		
-		for (int i = 0; i < thePickupSetups.length; i++) {
+		for (int i = 0; i < thePowerupSetups.length; i++) {
 			Point2D p = points.get(i);
 			x = p.getX();
 			y = p.getY();
-			energygain = battleProps.getPickupEnergyBonus();
-			respawntime = battleProps.getPickupRespawnTime();
-			thePickupSetups[i] = new PickupSetup(x, y, energygain, respawntime);
+			energygain = battleProps.getPowerupEnergyBonus();
+			respawntime = battleProps.getPowerupRespawnTime();
+			thePowerupSetups[i] = new PowerupSetup(x, y, energygain, respawntime);
 		}
 
 		for (int i = 0; i < positions.size(); i++) {
@@ -896,25 +896,25 @@ public final class Battle extends BaseBattle {
 			int j = 0;
 			if (len >= j+1 && coords[j].trim().length() > 0) {
 				try {
-					thePickupSetups[i].setX(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
+					thePowerupSetups[i].setX(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 				} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 				}
 				j++;
 				if (len >= j+1 && coords[j].trim().length() > 0) {
 					try {
-						thePickupSetups[i].setY(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
+						thePowerupSetups[i].setY(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 					} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 					}
 					j++;
 					if (len >= j+1 && coords[j].trim().length() > 0) {
 						try {
-							thePickupSetups[i].setEnergyBonus(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
+							thePowerupSetups[i].setEnergyBonus(Double.parseDouble(coords[j].replaceAll("[^0-9.]", "")));
 						} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 						}
 						j++;
 						if (len >= j+1 && coords[j].trim().length() > 0) {
 							try {
-								thePickupSetups[i].setRespawnTime(Long.parseLong(coords[j].replaceAll("[^0-9.]", "")));
+								thePowerupSetups[i].setRespawnTime(Long.parseLong(coords[j].replaceAll("[^0-9.]", "")));
 							} catch (NumberFormatException ignore) {// Could be the '?', which is fine
 							}
 						}
@@ -922,7 +922,7 @@ public final class Battle extends BaseBattle {
 				}
 			}
 		}
-		return thePickupSetups;
+		return thePowerupSetups;
 	}
 
 	private boolean oneTeamRemaining() {

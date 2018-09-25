@@ -905,9 +905,9 @@ public class JuniorRobot extends _RobotBase implements IJuniorRobot {
 		}
 
 		@Override
-		public void onScannedPickup(ScannedPickupEvent scannedPickupEvent) {}
+		public void onScannedPowerup(ScannedPowerupEvent scannedPickupEvent) {}
 
 		@Override
-		public void onPickup(PickupEvent pickupEvent) {}
+		public void onPowerup(PowerupEvent pickupEvent) {}
 	}
 }

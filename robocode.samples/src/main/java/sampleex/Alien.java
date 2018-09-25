@@ -80,7 +80,7 @@ public class Alien implements IBasicEvents, IBasicRobot, Runnable {
 
 	public void onWin(WinEvent e) {}
 
-	public void onScannedPickup(ScannedPickupEvent e) {}
+	public void onScannedPowerup(ScannedPowerupEvent e) {}
 
-	public void onPickup(PickupEvent e) {}
+	public void onPowerup(PowerupEvent e) {}
 }
